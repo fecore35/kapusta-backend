@@ -92,7 +92,6 @@ class AuthControllers {
     const exsistingUser = await userService.findByEmail(userData.data.email)
     if (!exsistingUser) {
       return await userService.create(userData.data)
-      // return console.log(userData.data)
     }
     const accessToken = await authService.getToken(exsistingUser)
     await authService.updateToken(exsistingUser.id, accessToken)
