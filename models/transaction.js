@@ -1,6 +1,7 @@
 import mongoose from 'mongoose'; 
 const { Schema, SchemaTypes, model } = mongoose; 
-const contactSchema = new Schema({
+// const contactSchema = new Schema({ - удалить
+const transactionSchema = new Schema({    
     day: {
         type: Number,
         required: [true, 'Set day for transaction'],
@@ -34,7 +35,7 @@ const contactSchema = new Schema({
         type: SchemaTypes.ObjectId,
         ref: 'user', 
         required: true,
-},
+    },
 },
 {
     versionKey: false,
@@ -49,6 +50,6 @@ const contactSchema = new Schema({
     toObject: { virtuals: true }
 }); 
 
-const Transaction = model('transaction', contactSchema); 
+const Transaction = model('transaction', transactionSchema); 
 
 export default Transaction;

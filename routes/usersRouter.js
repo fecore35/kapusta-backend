@@ -14,6 +14,8 @@ router.put('/:id/update', [guard, roleAccess(Role.ADMIN), validateId, validateUp
 
 router.delete('/:id', [guard, roleAccess(Role.ADMIN), validateId], userControllers.delUser);
 
-router.patch('/:id/balance', [guard, validateId, validateUpdateBalance], userControllers.putUser);
+router.put('/balance', [guard, validateUpdateBalance], userControllers.putUserBalance);
+
+router.get('/stats/:id/:month/:year', guard, userControllers.aggregation);
 
 export default router;

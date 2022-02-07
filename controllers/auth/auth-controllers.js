@@ -32,11 +32,12 @@ class AuthControllers {
         message: Messages.UNAUTHORIZED[req.app.get("lang")],
       })
     }
+    const { id } = user
     const token = authService.getToken(user)
     await authService.setToken(user.id, token)
     res
       .status(httpCodes.OK)
-      .json({ status: "success", code: httpCodes.OK, data: { token } })
+      .json({ status: "success", code: httpCodes.OK, data: { id, token } })
   }
 
   async logout(req, res, next) {

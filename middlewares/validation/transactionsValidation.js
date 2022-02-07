@@ -1,6 +1,7 @@
 import Joi from 'joi';
-// import mongoose from 'mongoose';
-import { httpCodes } from '../../lib/constants';
+import { httpCodes, Messages } from '../../lib/constants';
+import mongoose from 'mongoose';
+const { Types } = mongoose;
 
 const createSchema = Joi.object({
     day: Joi.number().required(), 
@@ -39,7 +40,14 @@ export const validateQuery = async (req, res, next) => {
         await querySchema.validateAsync(req.query);
     }
     catch (err) {
-        return res.status(httpCodes.BAD_REQUEST).json({ status: 'error', code: httpCodes.BAD_REQUEST, message: `Field ${err.message.replace(/"/g, '')}`});
+        return res.status(httpCodes.BAD_REQUEST).json({ status: 'error', code: httpCodes.BAD_REQUEST, message: `Field ${err.message.replace(/"/g, '')}` });
+    };
+    next();
+};
+
+export const validateId = async (req, res, next) => {
+    if (!Types.ObjectId.isValid(req.params.id)) {
+        return res.status(httpCodes.BAD_REQUEST).json({ status: 'error', code: httpCodes.BAD_REQUEST, message: Messages.BAD_REQUEST[req.app.get('lang')] });
     };
     next();
 };

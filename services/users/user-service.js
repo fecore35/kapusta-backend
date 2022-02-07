@@ -23,6 +23,12 @@ class UserService {
             result = await User.findOne({ _id: currentUserId })
         return result;
     };
+
+    async getUserBalanceById(currentUserId) {  
+        const user = await User.findById({ _id: currentUserId });
+        const result = user.balance;
+        return result;
+    };
     
     async list({ sortBy, sortByDesc }) {
         let sortCriteria = null;
