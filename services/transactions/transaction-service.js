@@ -1,12 +1,15 @@
 import Transaction from '../../models/transaction';
-
 import User from '../../models/user';
 import userService from '../../services/users/user-service';
+import pkg from 'mongoose';
+const { Types } = pkg;
 
 class TransactionService {
 
     async add(userId, body) { 
         const user = await User.findById(userId);
+        const fixedSum = Number(body.sum).toFixed(2);
+        console.log('fixedSum =', fixedSum);
         const currentBalance = user.balance;
         if (!body.income && Number(body.sum) > Number(currentBalance)) {
             return 
@@ -14,12 +17,12 @@ class TransactionService {
         
         let newBalance = null;
         body.income ?
-            newBalance = Number(currentBalance) + Number(body.sum) :
-            newBalance = Number(currentBalance) - Number(body.sum);
+            newBalance = Number(currentBalance) + Number(fixedSum) :
+            newBalance = Number(currentBalance) - Number(fixedSum);
         
         await userService.updateBalance(userId, newBalance);
-        const result = await Transaction.create({...body, owner: userId}); 
-        return result;
+        const result = await Transaction.create({ ...body, owner: userId, sum: fixedSum }); 
+        return {result, balance: newBalance}; // добавлен возврат обновленного баланса
     };
 
      async list(userId, {sortBy, sortByDesc,  page = 1, filter, limit = 120, favorite}, isAdmin) {
@@ -42,6 +45,48 @@ class TransactionService {
         (favorite === 'false') && (result = result.filter(item => item.favorite === false));
         (favorite === 'true') && (result = result.filter(item => item.favorite === true));
         return {total, page, transaction: result}; 
+    };
+
+    async getStatisticsTransactions(id, month, year) {
+        // const transactions = await Transaction.find({ owner: id, income: false }); удалить
+        // console.log('transactions= ', transactions); удалить
+        const spending = await Transaction.aggregate([
+            { $match: { owner: Types.ObjectId(id), income: false, month: Number(month), year: Number(year)} },
+            {
+                $group: {
+                    _id: 'spending-qwe',
+                    totalSpending: { $sum: '$sum' }
+                },
+            },
+        ]);
+        let totalSpen = null;
+        spending.length ?
+            totalSpen = spending[0].totalSpending :
+            totalSpen = 0;    
+
+        const income = await Transaction.aggregate([
+            { $match: { owner: Types.ObjectId(id), income: true, month: Number(month), year: Number(year)} },
+            {
+                $group: {
+                    _id: 'income-qwe',
+                    totalIncome: { $sum: '$sum' }
+                },
+            },
+        ]);
+        let totalIncomes = null;
+        income.length ?
+            totalIncomes = income[0].totalIncome :
+            totalIncomes = 0;
+
+        const result = { spending: totalSpen, income: totalIncomes, month: Number(month), year: Number(year) };
+        return result;
+    };
+
+    // del transaction
+
+    async remove(userId, transactionId) {
+            const result = await Transaction.findOneAndRemove({ _id: transactionId, owner: userId });
+        return result;
     };
 };
  

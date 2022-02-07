@@ -1,7 +1,7 @@
 {
   "name": "kapusta-backend",
   "version": "0.0.0",
-  "description": "node-js-homework-rest-api",
+  "description": "kapusta-backend",
   "private": true,
   "author": "Group#9",
   "type": "module",

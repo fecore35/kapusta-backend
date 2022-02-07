@@ -1,4 +1,3 @@
-
 import { validateRegistration, validateLogin } from '../middlewares/validation/authValidation';
 import authControllers from '../controllers/auth/auth-controllers';
 import guard from '../middlewares/guard'; 

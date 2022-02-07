@@ -1,4 +1,5 @@
 import userService from '../../services/users/user-service';
+import transactionService from '../../services/transactions/transaction-service';
 import {httpCodes, Messages, Role} from '../../lib/constants';
 
 class UserControllers {
@@ -13,11 +14,11 @@ class UserControllers {
         (id === 'current') && (id = currentUserId);
         const isAdmin = (req.user.role === Role.ADMIN);
         const soughtUser = await userService.getById(id, currentUserId, isAdmin);
-        const { name, email, role, subscription } = soughtUser;
+        const { name, email, role, balance } = soughtUser;
         let result = null;
         isAdmin ?
             result = soughtUser :
-            result = {name, email, role, subscription};
+            result = {name, email, role, balance};
         soughtUser ?
             res.status(httpCodes.OK).json({ status: 'success', code: httpCodes.OK, data: {result}} ) : 
             res.status(httpCodes.NOT_FOUND).json({ status: 'error', code: httpCodes.NOT_FOUND, message: Messages.NOT_FOUND[req.app.get('lang')]});
@@ -36,8 +37,34 @@ class UserControllers {
         const { id } = req.params;  
         const updatedUser = await userService.update(id, req.body);
         updatedUser ?
-            res.status(httpCodes.OK).json( {status: 'success', code: httpCodes.OK, message: req.body} ) :
+            res.status(httpCodes.OK).json( {status: 'success', code: httpCodes.OK, message: req.body.balance} ) :
             res.status(httpCodes.NOT_FOUND).json({ status: 'error', code: httpCodes.NOT_FOUND, message: Messages.NOT_FOUND[req.app.get('lang')]});
+    };
+
+    async putUserBalance(req, res, next) {
+        const { id, balance } = req.body;  
+        if (balance < 0) {
+            return res.status(httpCodes.OK).json( {status: 'success', code: httpCodes.OK, message: 'Balance value must be positive'} )
+        };
+        const currentBalance = await userService.getUserBalanceById(id);
+        const newBalance = currentBalance + balance;
+        const updatedUser = await userService.updateBalance(id, newBalance.toFixed(2));
+        updatedUser ?
+            res.status(httpCodes.OK).json( {status: 'success', code: httpCodes.OK, message: newBalance.toFixed(2)} ) :
+            res.status(httpCodes.NOT_FOUND).json({ status: 'error', code: httpCodes.NOT_FOUND, message: Messages.NOT_FOUND[req.app.get('lang')]});
+    };
+
+    async aggregation (req, res, next) {
+        const { id, month, year } = req.params;
+        const data = await transactionService.getStatisticsTransactions(id, month, year)
+        if (data) {
+            return res
+            .status(httpCodes.OK)
+            .json({ status: 'success', code: httpCodes.OK, data })
+        }
+        res
+            .status(httpCodes.NOT_FOUND)
+            .json({ status: 'error', code: httpCodes.NOT_FOUND, message: 'Not found' })
     };
 };
 

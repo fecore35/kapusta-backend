@@ -12,6 +12,7 @@ const updateSchema = Joi.object({
 });
 
 const updateBalanceSchema = Joi.object({
+    id: Joi.string(),
     balance: Joi.number().required()
 });
 
