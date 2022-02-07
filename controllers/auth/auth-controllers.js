@@ -89,16 +89,16 @@ class AuthControllers {
       },
     })
 
-    const exsistingUser = await userService.findByEmail(userData.data.email)
-    if (!exsistingUser) {
+    const isUserExist = await userService.findByEmail(userData.data.email)
+    if (!isUserExist) {
       return await userService.create(userData.data)
     }
-    const accessToken = await authService.getToken(exsistingUser)
-    await authService.updateToken(exsistingUser.id, accessToken)
-    console.log(exsistingUser)
+    const token = await authService.getToken(isUserExist)
+    await authService.updateToken(isUserExist.id, token)
+    // console.log(isUserExist)
 
     return res.redirect(
-      `${process.env.FRONTEND_URL}?accessToken=${accessToken}`
+      `${process.env.FRONTEND_URL}?${isUserExist}&token=${token}`
     )
   }
 }
