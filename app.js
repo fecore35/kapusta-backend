@@ -2,15 +2,10 @@ import express from "express"
 import logger from "morgan"
 import cors from "cors"
 import helmet from "helmet"
-import { fileURLToPath } from "url"
-import { dirname, join } from "path"
 import { httpCodes, LIMIT_JSON } from "./lib/constants"
 import authRouter from "./routes/authRouters"
 import usersRouter from "./routes/usersRouter"
 import transactionsRouter from "./routes/transactionsRouter"
-
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = dirname(__filename)
 
 const app = express()
 
@@ -28,9 +23,6 @@ app.use((req, res, next) => {
 app.use("/api/auth", authRouter)
 app.use("/api/users", usersRouter)
 app.use("/api/transactions", transactionsRouter)
-app.use("/api/link", (req, res) => {
-  res.sendFile(join(__dirname, "/public/link.html"))
-})
 
 app.use((req, res) => {
   res

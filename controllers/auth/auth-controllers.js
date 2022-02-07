@@ -93,12 +93,12 @@ class AuthControllers {
     if (!isUserExist) {
       return await userService.create(userData.data)
     }
-    const token = await authService.getToken(isUserExist)
-    await authService.updateToken(isUserExist.id, token)
+    const newToken = await authService.getToken(isUserExist)
+    await authService.updateToken(isUserExist.id, newToken)
     // console.log(isUserExist)
 
     return res.redirect(
-      `${process.env.FRONTEND_URL}?${isUserExist}&token=${token}`
+      `${process.env.FRONTEND_URL}/home?${isUserExist}&newToken=${newToken}`
     )
   }
 }
