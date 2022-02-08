@@ -187,33 +187,23 @@
         "parameters": [],
         "security": [{ "Bearer": [] }],
         "requestBody": {
-          "description": "Registration's object",
+          "description": "Getting all users",
           "required": false,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RegistrationRequest"
-              }
-            }
-          }
+          "content": {}
         },
         "responses": {
-          "201": {
-            "description": "Successful operation",
+          "200": {
+            "description": "success",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RegistrationResponse"
+                  "$ref": "#/components/schemas/GetUsersResponse"
                 }
               }
             }
           },
           "400": {
-            "description": "Bad request (invalid request body)",
-            "content": {}
-          },
-          "409": {
-            "description": "Provided email already exists",
+            "description": "Bad request",
             "content": {}
           }
         }
@@ -222,37 +212,46 @@
     "/api/users/stats/:id/:month/:year": {
       "get": {
         "tags": ["Users"],
-        "summary": "Users info by aggregation",
-        "parameters": [],
+        "summary": "User`s transactions info by some time",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "type": "string",
+            "description": "User's id"
+          },
+          {
+            "in": "path",
+            "name": "month",
+            "type": "integer",
+            "description": "Month"
+          },
+          {
+            "in": "path",
+            "name": "year",
+            "type": "integer",
+            "description": "Year"
+          }
+        ],
         "security": [{ "Bearer": [] }],
         "requestBody": {
-          "description": "Registration's object",
+          "description": "Get info about transactions",
           "required": false,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RegistrationRequest"
-              }
-            }
-          }
+          "content": {}
         },
         "responses": {
-          "201": {
-            "description": "Successful operation",
+          "200": {
+            "description": "success",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RegistrationResponse"
+                  "$ref": "#/components/schemas/StatsResponse"
                 }
               }
             }
           },
           "400": {
-            "description": "Bad request (invalid request body)",
-            "content": {}
-          },
-          "409": {
-            "description": "Provided email already exists",
+            "description": "Bad request",
             "content": {}
           }
         }
@@ -262,36 +261,33 @@
       "get": {
         "tags": ["Users"],
         "summary": "Users info",
-        "parameters": [],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "type": "string",
+            "description": "User's id"
+          }
+        ],
         "security": [{ "Bearer": [] }],
         "requestBody": {
-          "description": "Registration's object",
+          "description": "Get user info",
           "required": false,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RegistrationRequest"
-              }
-            }
-          }
+          "content": {}
         },
         "responses": {
-          "201": {
-            "description": "Successful operation",
+          "200": {
+            "description": "success",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RegistrationResponse"
+                  "$ref": "#/components/schemas/UserInfoResponse"
                 }
               }
             }
           },
-          "400": {
-            "description": "Bad request (invalid request body)",
-            "content": {}
-          },
-          "409": {
-            "description": "Provided email already exists",
+          "404": {
+            "description": "Not found",
             "content": {}
           }
         }
@@ -299,36 +295,33 @@
       "delete": {
         "tags": ["Users"],
         "summary": "Delete Users only for ADMIN",
-        "parameters": [],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "type": "string",
+            "description": "User's id"
+          }
+        ],
         "security": [{ "Bearer": [] }],
         "requestBody": {
-          "description": "Registration's object",
+          "description": "Delete user",
           "required": false,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RegistrationRequest"
-              }
-            }
-          }
+          "content": {}
         },
         "responses": {
-          "201": {
-            "description": "Successful operation",
+          "200": {
+            "description": "success",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RegistrationResponse"
+                  "$ref": "#/components/schemas/DeleteUserResponse"
                 }
               }
             }
           },
-          "400": {
-            "description": "Bad request (invalid request body)",
-            "content": {}
-          },
-          "409": {
-            "description": "Provided email already exists",
+          "404": {
+            "description": "Not found",
             "content": {}
           }
         }
@@ -611,6 +604,239 @@
         "example": {
           "id": "62025fac12117b1ff96783a2",
           "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyMDI1ZmFjMTIxMTdiMWZmOTY3ODNhMiIsImlhdCI6MTY0NDMyMzc5MSwiZXhwIjoxNjQ0MzY2OTkxfQ.23Y08DlB-pO8B0WLfQ2pfDe3obl5tOAZ7AyWXpHXKRY"
+        }
+      },
+      "GetUsersResponse": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "description": "Count users",
+            "example": 10
+          },
+          "users": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "balance": {
+                  "type": "number",
+                  "description": "Current balance user`s",
+                  "example": 5000
+                },
+                "_id": {
+                  "type": "string",
+                  "description": "Unique id user`s",
+                  "example": "62025fac12117b1ff96783a2"
+                },
+                "name": {
+                  "type": "string",
+                  "description": "User`s name",
+                  "example": "Rostik"
+                },
+                "email": {
+                  "type": "string",
+                  "description": "User`s email",
+                  "example": "admin@admin.com",
+                  "format": "email"
+                },
+                "password": {
+                  "type": "string",
+                  "description": "User`s password",
+                  "example": "qwert12345"
+                },
+                "role": {
+                  "type": "string",
+                  "description": "User`s role for app",
+                  "example": "user"
+                },
+                "token": {
+                  "type": "string",
+                  "description": "User's token for app",
+                  "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyMDI1ZmFjMTIxMTdiMWZmOTY3ODNhMiIsImlhdCI6MTY0NDMyMzc5MSwiZXhwIjoxNjQ0MzY2OTkxfQ.23Y08DlB-pO8B0WLfQ2pfDe3obl5tOAZ7AyWXpHXKRY"
+                },
+                "createdAt": {
+                  "type": "string",
+                  "description": "User`s data created",
+                  "example": "2022-02-04T06:27:31.669Z"
+                },
+                "updateAt": {
+                  "type": "string",
+                  "description": "User`s data updated",
+                  "example": "2022-02-04T06:27:31.669Z"
+                }
+              }
+            },
+            "description": "User's token for app",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyMDI1ZmFjMTIxMTdiMWZmOTY3ODNhMiIsImlhdCI6MTY0NDMyMzc5MSwiZXhwIjoxNjQ0MzY2OTkxfQ.23Y08DlB-pO8B0WLfQ2pfDe3obl5tOAZ7AyWXpHXKRY"
+          }
+        },
+        "description": "Count users in cloud",
+        "example": {
+          "total": 13,
+          "users": [
+            {
+              "balance": 0,
+              "_id": "61fcc7533ee7596562f46e97",
+              "name": "ADMIN",
+              "email": "admin@admin.com",
+              "password": "$2a$06$Y6SAbFDlWScj7yaxi.eeyuog4JeluFzyzlNkEOSOL1J9FNjwkQdja",
+              "subscription": "starter",
+              "role": "administrator",
+              "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYxZmNjNzUzM2VlNzU5NjU2MmY0NmU5NyIsImlhdCI6MTY0NDAyNjQzMCwiZXhwIjoxNjQ0MDY5NjMwfQ.r3QwsK54uNKqonayNSQcQnLBbRISbMB8Th20GJFao2s",
+              "createdAt": "2022-02-04T06:27:31.669Z",
+              "updatedAt": "2022-02-05T02:00:30.533Z"
+            },
+            {
+              "balance": 0,
+              "_id": "61fd1ab1b5a7668232d1b617",
+              "name": "ADMIN-rost",
+              "email": "rost@admin.com",
+              "password": "$2a$06$NwtTmGsT05tM8C.D629PGehGKMyZQib5bzJrnSna1.6lz0jMxCf.y",
+              "subscription": "starter",
+              "role": "administrator",
+              "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYxZmQxYWIxYjVhNzY2ODIzMmQxYjYxNyIsImlhdCI6MTY0Mzk3NzQzOSwiZXhwIjoxNjQ0MDIwNjM5fQ.TwBKSvF8qAtuY5ipPBwlTIvKZ2sB8WJzmlx0OgIEaNM",
+              "createdAt": "2022-02-04T12:23:13.442Z",
+              "updatedAt": "2022-02-04T12:23:59.177Z"
+            }
+          ]
+        }
+      },
+      "StatsResponse": {
+        "type": "object",
+        "properties": {
+          "spending": {
+            "type": "number",
+            "description": "User's transactions",
+            "example": 2400
+          },
+          "income": {
+            "type": "number",
+            "description": "User's transactions",
+            "example": 2400
+          },
+          "month": {
+            "type": "integer",
+            "description": "Month",
+            "example": 1
+          },
+          "year": {
+            "type": "integer",
+            "description": "Year",
+            "example": 1
+          }
+        },
+        "example": {
+          "spending": 2401.24,
+          "income": 2401.24,
+          "month": 1,
+          "year": 2022
+        }
+      },
+      "UserInfoResponse": {
+        "type": "object",
+        "properties": {
+          "result": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "User's name",
+                "example": "Rostik"
+              },
+              "email": {
+                "type": "string",
+                "description": "User's email",
+                "example": "user1@ordy.com",
+                "format": "email"
+              },
+              "role": {
+                "type": "string",
+                "description": "User's role",
+                "example": "user"
+              },
+              "balance": {
+                "type": "number",
+                "description": "User's balance",
+                "example": 5000
+              }
+            },
+            "example": {
+              "name": "user#1",
+              "email": "user1@ordy.com",
+              "role": "user",
+              "balance": 5000
+            }
+          }
+        }
+      },
+      "DeleteUserResponse": {
+        "type": "object",
+        "properties": {
+          "deletedUser": {
+            "type": "object",
+            "properties": {
+              "balance": {
+                "type": "number",
+                "description": "Current balance user`s",
+                "example": 5000
+              },
+              "_id": {
+                "type": "string",
+                "description": "Unique id user`s",
+                "example": "62025fac12117b1ff96783a2"
+              },
+              "name": {
+                "type": "string",
+                "description": "User`s name",
+                "example": "Rostik"
+              },
+              "email": {
+                "type": "string",
+                "description": "User`s email",
+                "example": "admin@admin.com",
+                "format": "email"
+              },
+              "password": {
+                "type": "string",
+                "description": "User`s password",
+                "example": "qwert12345"
+              },
+              "role": {
+                "type": "string",
+                "description": "User`s role for app",
+                "example": "user"
+              },
+              "token": {
+                "type": "string",
+                "description": "User's token for app",
+                "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyMDI1ZmFjMTIxMTdiMWZmOTY3ODNhMiIsImlhdCI6MTY0NDMyMzc5MSwiZXhwIjoxNjQ0MzY2OTkxfQ.23Y08DlB-pO8B0WLfQ2pfDe3obl5tOAZ7AyWXpHXKRY"
+              },
+              "createdAt": {
+                "type": "string",
+                "description": "User`s data created",
+                "example": "2022-02-04T06:27:31.669Z"
+              },
+              "updateAt": {
+                "type": "string",
+                "description": "User`s data updated",
+                "example": "2022-02-04T06:27:31.669Z"
+              }
+            }
+          }
+        },
+        "example": {
+          "deletedUser": {
+            "balance": 0,
+            "_id": "61fd28b1e0566d64abc6f87a",
+            "name": "ordinary№2",
+            "email": "ordynary2@ordy.com",
+            "password": "$2a$06$OMr9dpN5iOWhaCl2D0x5Qu6xVbPj2qG1.eB6aZuDBJvfsloL.bbg2",
+            "role": "user",
+            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYxZmQyOGIxZTA1NjZkNjRhYmM2Zjg3YSIsImlhdCI6MTY0Mzk4MTIyNywiZXhwIjoxNjQ0MDI0NDI3fQ.r0UX3dDxAtEFmJVK24jBhLjdmVj_WnewgDvhSXrntoE",
+            "createdAt": "2022-02-04T13:22:57.968Z",
+            "updatedAt": "2022-02-04T13:27:07.976Z"
+          }
         }
       }
     },
