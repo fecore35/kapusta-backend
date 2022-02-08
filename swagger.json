@@ -24,19 +24,15 @@
     {
       "name": "Transactions",
       "description": "Transactions endpoints"
-    },
-    {
-      "name": "Docs",
-      "description": "Documentation"
     }
   ],
   "paths": {
     "/api/auth/google": {
       "get": {
         "tags": ["Auth"],
-        "summary": "User registration by google",
+        "summary": "User registration by google service",
         "parameters": [],
-        "security": [{ "Bearer": [] }],
+        "security": [],
         "requestBody": {
           "description": "Registration's object",
           "required": false,
@@ -49,22 +45,16 @@
           }
         },
         "responses": {
-          "201": {
-            "description": "Successful operation",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RegistrationResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request (invalid request body)",
+          "302": {
+            "description": "Found",
             "content": {}
           },
-          "409": {
-            "description": "Provided email already exists",
+          "304": {
+            "description": "Not Modified",
+            "content": {}
+          },
+          "400": {
+            "description": "Bad request",
             "content": {}
           }
         }
@@ -75,35 +65,19 @@
         "tags": ["Auth"],
         "summary": "User registration by google",
         "parameters": [],
-        "security": [{ "Bearer": [] }],
+        "security": [],
         "requestBody": {
-          "description": "Registration's object",
+          "description": "Sign by google",
           "required": false,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RegistrationRequest"
-              }
-            }
-          }
+          "content": {}
         },
         "responses": {
-          "201": {
-            "description": "Successful operation",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RegistrationResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request (invalid request body)",
+          "302": {
+            "description": "Found",
             "content": {}
           },
-          "409": {
-            "description": "Provided email already exists",
+          "400": {
+            "description": "Bad request",
             "content": {}
           }
         }
@@ -114,7 +88,7 @@
         "tags": ["Auth"],
         "summary": "User registration",
         "parameters": [],
-        "security": [{ "Bearer": [] }],
+        "security": [],
         "requestBody": {
           "description": "Registration's object",
           "required": true,
@@ -127,8 +101,8 @@
           }
         },
         "responses": {
-          "201": {
-            "description": "Successful operation",
+          "200": {
+            "description": "success",
             "content": {
               "application/json": {
                 "schema": {
@@ -142,7 +116,7 @@
             "content": {}
           },
           "409": {
-            "description": "Provided email already exists",
+            "description": "Such email is registered already",
             "content": {}
           }
         }
@@ -151,7 +125,7 @@
     "/api/auth/login": {
       "post": {
         "tags": ["Auth"],
-        "summary": "User registration",
+        "summary": "User login",
         "parameters": [],
         "security": [{ "Bearer": [] }],
         "requestBody": {
@@ -160,28 +134,28 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/RegistrationRequest"
+                "$ref": "#/components/schemas/LoginRequest"
               }
             }
           }
         },
         "responses": {
-          "201": {
-            "description": "Successful operation",
+          "200": {
+            "description": "success",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RegistrationResponse"
+                  "$ref": "#/components/schemas/LoginResponse"
                 }
               }
             }
           },
           "400": {
-            "description": "Bad request (invalid request body)",
+            "description": "Bad request",
             "content": {}
           },
-          "409": {
-            "description": "Provided email already exists",
+          "401": {
+            "description": "Invalid credential",
             "content": {}
           }
         }
@@ -190,37 +164,17 @@
     "/api/auth/logout": {
       "post": {
         "tags": ["Auth"],
-        "summary": "User registration",
+        "summary": "User logout",
         "parameters": [],
         "security": [{ "Bearer": [] }],
         "requestBody": {
-          "description": "Registration's object",
+          "description": "Logout user",
           "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RegistrationRequest"
-              }
-            }
-          }
+          "content": {}
         },
         "responses": {
-          "201": {
-            "description": "Successful operation",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RegistrationResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request (invalid request body)",
-            "content": {}
-          },
-          "409": {
-            "description": "Provided email already exists",
+          "204": {
+            "description": "success",
             "content": {}
           }
         }
@@ -593,26 +547,71 @@
         }
       },
       "RegistrationResponse": {
-        "type": "array",
-        "items": {
-          "type": "object",
-          "properties": {
-            "email": {
-              "type": "string",
-              "description": "User's email",
-              "format": "email"
-            },
-            "userId": {
-              "type": "number",
-              "description": "User's id",
-              "example": "32143232436545474"
-            }
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "User's email",
+            "format": "email"
+          },
+          "id": {
+            "type": "string",
+            "description": "User's id",
+            "example": "62025fac12117b1ff96783a2"
+          },
+          "role": {
+            "type": "string",
+            "description": "User's role in app",
+            "example": "user"
+          },
+          "balance": {
+            "type": "number",
+            "description": "User's balance",
+            "example": 2022
           }
         },
-        "example": [
-          { "email": "1@gmail.com", "userId": "1" },
-          { "email": "2@gmail.com", "userId": "2" }
-        ]
+        "example": {
+          "id": "62025fac12117b1ff96783a2",
+          "name": "Guest",
+          "email": "ihor.yatsyshynn@gmail.com",
+          "role": "user",
+          "balance": 0
+        }
+      },
+      "LoginRequest": {
+        "type": "object",
+        "required": ["email", "password"],
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "User's email",
+            "format": "email"
+          },
+          "password": {
+            "type": "string",
+            "description": "User's password",
+            "example": "qwerty123"
+          }
+        }
+      },
+      "LoginResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "User's id",
+            "example": "62025fac12117b1ff96783a2"
+          },
+          "token": {
+            "type": "string",
+            "description": "User's token for app",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyMDI1ZmFjMTIxMTdiMWZmOTY3ODNhMiIsImlhdCI6MTY0NDMyMzc5MSwiZXhwIjoxNjQ0MzY2OTkxfQ.23Y08DlB-pO8B0WLfQ2pfDe3obl5tOAZ7AyWXpHXKRY"
+          }
+        },
+        "example": {
+          "id": "62025fac12117b1ff96783a2",
+          "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyMDI1ZmFjMTIxMTdiMWZmOTY3ODNhMiIsImlhdCI6MTY0NDMyMzc5MSwiZXhwIjoxNjQ0MzY2OTkxfQ.23Y08DlB-pO8B0WLfQ2pfDe3obl5tOAZ7AyWXpHXKRY"
+        }
       }
     },
     "securitySchemes": {
