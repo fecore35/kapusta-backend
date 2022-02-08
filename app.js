@@ -2,6 +2,8 @@ import express from "express"
 import logger from "morgan"
 import cors from "cors"
 import helmet from "helmet"
+import swaggerUi from "swagger-ui-express"
+import swaggerDocument from "./swagger.json"
 import { httpCodes, LIMIT_JSON } from "./lib/constants"
 import authRouter from "./routes/authRouters"
 import usersRouter from "./routes/usersRouter"
@@ -23,6 +25,7 @@ app.use((req, res, next) => {
 app.use("/api/auth", authRouter)
 app.use("/api/users", usersRouter)
 app.use("/api/transactions", transactionsRouter)
+app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument))
 
 app.use((req, res) => {
   res
