@@ -27,7 +27,7 @@
     }
   ],
   "paths": {
-    "/api/auth/google": {
+    "/auth/google": {
       "get": {
         "tags": ["Auth"],
         "summary": "User registration by google service",
@@ -60,7 +60,7 @@
         }
       }
     },
-    "/api/auth/google-redirect": {
+    "/auth/google-redirect": {
       "get": {
         "tags": ["Auth"],
         "summary": "User registration by google",
@@ -83,7 +83,7 @@
         }
       }
     },
-    "/api/auth/registration": {
+    "/auth/registration": {
       "post": {
         "tags": ["Auth"],
         "summary": "User registration",
@@ -122,7 +122,7 @@
         }
       }
     },
-    "/api/auth/login": {
+    "/auth/login": {
       "post": {
         "tags": ["Auth"],
         "summary": "User login",
@@ -161,7 +161,7 @@
         }
       }
     },
-    "/api/auth/logout": {
+    "/auth/logout": {
       "post": {
         "tags": ["Auth"],
         "summary": "User logout",
@@ -180,7 +180,7 @@
         }
       }
     },
-    "/api/users": {
+    "/users": {
       "get": {
         "tags": ["Users"],
         "summary": "Users info only for ADMIN",
@@ -209,55 +209,7 @@
         }
       }
     },
-    "/api/users/stats/:id/:month/:year": {
-      "get": {
-        "tags": ["Users"],
-        "summary": "User`s transactions info by some time",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "type": "string",
-            "description": "User's id"
-          },
-          {
-            "in": "path",
-            "name": "month",
-            "type": "integer",
-            "description": "Month"
-          },
-          {
-            "in": "path",
-            "name": "year",
-            "type": "integer",
-            "description": "Year"
-          }
-        ],
-        "security": [{ "Bearer": [] }],
-        "requestBody": {
-          "description": "Get info about transactions",
-          "required": false,
-          "content": {}
-        },
-        "responses": {
-          "200": {
-            "description": "success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StatsResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request",
-            "content": {}
-          }
-        }
-      }
-    },
-    "/api/users/:id": {
+    "/users/:id": {
       "get": {
         "tags": ["Users"],
         "summary": "Users info",
@@ -327,7 +279,7 @@
         }
       }
     },
-    "/api/users/:id/update": {
+    "/users/:id/update": {
       "put": {
         "tags": ["Users"],
         "summary": "Users info only for ADMIN",
@@ -366,7 +318,7 @@
         }
       }
     },
-    "/api/users/balance": {
+    "/users/balance": {
       "put": {
         "tags": ["Users"],
         "summary": "Change balance for current user",
@@ -405,7 +357,7 @@
         }
       }
     },
-    "/api/transactions": {
+    "/transactions": {
       "get": {
         "tags": ["Transactions"],
         "summary": "Get transactions",
@@ -481,7 +433,7 @@
         }
       }
     },
-    "/api/transactions/:id": {
+    "/transactions/:id": {
       "delete": {
         "tags": ["Transactions"],
         "summary": "Delete Transactions only for ADMIN",
@@ -700,37 +652,6 @@
               "updatedAt": "2022-02-04T12:23:59.177Z"
             }
           ]
-        }
-      },
-      "StatsResponse": {
-        "type": "object",
-        "properties": {
-          "spending": {
-            "type": "number",
-            "description": "User's transactions",
-            "example": 2400
-          },
-          "income": {
-            "type": "number",
-            "description": "User's transactions",
-            "example": 2400
-          },
-          "month": {
-            "type": "integer",
-            "description": "Month",
-            "example": 1
-          },
-          "year": {
-            "type": "integer",
-            "description": "Year",
-            "example": 1
-          }
-        },
-        "example": {
-          "spending": 2401.24,
-          "income": 2401.24,
-          "month": 1,
-          "year": 2022
         }
       },
       "UserInfoResponse": {
