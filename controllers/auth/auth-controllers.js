@@ -93,7 +93,7 @@ class AuthControllers {
     const isUserExist = await userService.findByEmail(userData.data.email)
     if (!isUserExist) {
       const newUser = await userService.create(userData.data)
-      const tokenForNewUser = await authService.getToken(newUser)
+      const tokenForNewUser = authService.getToken(newUser)
       await authService.setToken(newUser.id, tokenForNewUser)
       const isNewUser = await userService.findByEmail(newUser.email)
 

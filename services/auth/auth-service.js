@@ -19,7 +19,7 @@ class AuthService {
     return user
   }
 
-  async getToken(user) {
+  getToken(user) {
     const id = user.id
     const payload = { id }
     const token = jwt.sign(payload, SECRET_KEY, { expiresIn: "12h" })
