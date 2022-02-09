@@ -34,4 +34,10 @@ router.get(
   transactionControllers.transactionsSummary
 )
 
+router.get(
+  "/stats",
+  [guard, validateQuery],
+  transactionControllers.transactionsStats
+)
+
 export default router

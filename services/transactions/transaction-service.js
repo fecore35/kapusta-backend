@@ -1,6 +1,7 @@
 import Transaction from "../../models/transaction"
 import User from "../../models/user"
 import userService from "../../services/users/user-service"
+import { CATEGORIES } from "../../lib/constants"
 import pkg from "mongoose"
 const { Types } = pkg
 
@@ -166,6 +167,44 @@ class TransactionService {
       owner: userId,
     })
     return result
+  }
+
+  async monthCategoryStats(userId, year, month) {
+    const amounts = await this.transactionsMonthSum(userId, year, month)
+
+    const categoriesSumArr = []
+    for (const item of CATEGORIES) {
+      const sum = await Transaction.aggregate([
+        {
+          $match: {
+            owner: Types.ObjectId(userId),
+            year: Number(year),
+            month: Number(month),
+            category: item,
+          },
+        },
+        {
+          $group: {
+            _id: "category-qwe",
+            totalSum: { $sum: "$sum" },
+          },
+        },
+      ])
+      let totalSum = null
+      sum.length ? (totalSum = sum[0].totalSum.toFixed(2)) : (totalSum = 0)
+
+      const result = {
+        category: item,
+        totalSum: totalSum,
+      }
+
+      categoriesSumArr.push(result)
+    }
+
+    return {
+      amounts: amounts,
+      categoriesSum: categoriesSumArr,
+    }
   }
 }
 
