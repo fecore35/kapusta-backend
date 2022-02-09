@@ -20,9 +20,9 @@ app.use((req, res, next) => {
   next()
 })
 
-app.use("/api/auth", authRouter)
-app.use("/api/users", usersRouter)
-app.use("/api/transactions", transactionsRouter)
+app.use("/auth", authRouter)
+app.use("/users", usersRouter)
+app.use("/transactions", transactionsRouter)
 
 app.use((req, res) => {
   res

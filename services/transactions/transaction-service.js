@@ -1,95 +1,174 @@
-import Transaction from '../../models/transaction';
-import User from '../../models/user';
-import userService from '../../services/users/user-service';
-import pkg from 'mongoose';
-const { Types } = pkg;
+import Transaction from "../../models/transaction"
+import User from "../../models/user"
+import userService from "../../services/users/user-service"
+import pkg from "mongoose"
+const { Types } = pkg
 
 class TransactionService {
+  async add(userId, body) {
+    const user = await User.findById(userId)
+    const fixedSum = Number(body.sum).toFixed(2)
+    console.log("fixedSum =", fixedSum)
+    const currentBalance = user.balance
+    if (!body.income && Number(body.sum) > Number(currentBalance)) {
+      return
+    }
 
-    async add(userId, body) { 
-        const user = await User.findById(userId);
-        const fixedSum = Number(body.sum).toFixed(2);
-        console.log('fixedSum =', fixedSum);
-        const currentBalance = user.balance;
-        if (!body.income && Number(body.sum) > Number(currentBalance)) {
-            return 
-        };
-        
-        let newBalance = null;
-        body.income ?
-            newBalance = Number(currentBalance) + Number(fixedSum) :
-            newBalance = Number(currentBalance) - Number(fixedSum);
-        
-        await userService.updateBalance(userId, newBalance);
-        const result = await Transaction.create({ ...body, owner: userId, sum: fixedSum }); 
-        return {result, balance: newBalance}; // добавлен возврат обновленного баланса
-    };
+    let newBalance = null
+    body.income
+      ? (newBalance = Number(currentBalance) + Number(fixedSum))
+      : (newBalance = Number(currentBalance) - Number(fixedSum))
 
-     async list(userId, {sortBy, sortByDesc,  page = 1, filter, limit = 120, favorite}, isAdmin) {
-        let sortCriteria = null;
-        let total = await Transaction.find({ owner: userId }).countDocuments();
-        isAdmin && (total = await Transaction.find().countDocuments());
-        let result = null;
-        isAdmin ?
-            result = Transaction.find().populate({ path: 'owner', select: 'name email  role subscription' }) :
-            result = Transaction.find({ owner: userId }).populate({ path: 'owner', select: 'name email  role subscription' }); 
+    await userService.updateBalance(userId, newBalance)
+    const result = await Transaction.create({
+      ...body,
+      owner: userId,
+      sum: fixedSum,
+    })
+    return { result, balance: newBalance }
+  }
 
-        sortBy && (sortCriteria = { [`${sortBy}`]: 1 }); 
-        sortByDesc && (sortCriteria = { [`${sortByDesc}`]: -1 }); 
-        filter && (result = result.select(filter.split('|').join(' ')));
-        (page < 0) && (page = 1); 
-        ((Number(page) - 1) * Number(limit) > total) && ( page = Math.ceil(total / Number(limit)));
+  async list(
+    userId,
+    { sortBy, sortByDesc, page = 1, filter, limit = 1000 },
+    isAdmin
+  ) {
+    let sortCriteria = null
+    let total = await Transaction.find({ owner: userId }).countDocuments()
+    isAdmin && (total = await Transaction.find().countDocuments())
+    let result = null
+    isAdmin
+      ? (result = Transaction.find().populate({
+          path: "owner",
+          select: "name email  role subscription",
+        }))
+      : (result = Transaction.find({ owner: userId }).populate({
+          path: "owner",
+          select: "name email  role subscription",
+        }))
 
-        result = await result.skip((Number(page) - 1) * Number(limit)).limit(Number(limit)).sort(sortCriteria); 
+    sortBy && (sortCriteria = { [`${sortBy}`]: 1 })
+    sortByDesc && (sortCriteria = { [`${sortByDesc}`]: -1 })
+    filter && (result = result.select(filter.split("|").join(" ")))
+    page < 0 && (page = 1)
+    ;(Number(page) - 1) * Number(limit) > total &&
+      (page = Math.ceil(total / Number(limit)))
 
-        (favorite === 'false') && (result = result.filter(item => item.favorite === false));
-        (favorite === 'true') && (result = result.filter(item => item.favorite === true));
-        return {total, page, transaction: result}; 
-    };
+    result = await result
+      .skip((Number(page) - 1) * Number(limit))
+      .limit(Number(limit))
+      .sort(sortCriteria)
+    return { total, page, transaction: result }
+  }
 
-    async getStatisticsTransactions(id, month, year) {
-        // const transactions = await Transaction.find({ owner: id, income: false }); удалить
-        // console.log('transactions= ', transactions); удалить
-        const spending = await Transaction.aggregate([
-            { $match: { owner: Types.ObjectId(id), income: false, month: Number(month), year: Number(year)} },
-            {
-                $group: {
-                    _id: 'spending-qwe',
-                    totalSpending: { $sum: '$sum' }
-                },
-            },
-        ]);
-        let totalSpen = null;
-        spending.length ?
-            totalSpen = spending[0].totalSpending :
-            totalSpen = 0;    
+  async transactionsMonthSum(userId, year, month) {
+    const spending = await Transaction.aggregate([
+      {
+        $match: {
+          owner: Types.ObjectId(userId),
+          income: false,
+          year: Number(year),
+          month: Number(month),
+        },
+      },
+      {
+        $group: {
+          _id: "spending-qwe",
+          totalSpending: { $sum: "$sum" },
+        },
+      },
+    ])
+    let totalSpending = null
+    spending.length
+      ? (totalSpending = spending[0].totalSpending.toFixed(2))
+      : (totalSpending = 0)
 
-        const income = await Transaction.aggregate([
-            { $match: { owner: Types.ObjectId(id), income: true, month: Number(month), year: Number(year)} },
-            {
-                $group: {
-                    _id: 'income-qwe',
-                    totalIncome: { $sum: '$sum' }
-                },
-            },
-        ]);
-        let totalIncomes = null;
-        income.length ?
-            totalIncomes = income[0].totalIncome :
-            totalIncomes = 0;
+    const profit = await Transaction.aggregate([
+      {
+        $match: {
+          owner: Types.ObjectId(userId),
+          income: true,
+          year: Number(year),
+          month: Number(month),
+        },
+      },
+      {
+        $group: {
+          _id: "profit-qwe",
+          totalIncome: { $sum: "$sum" },
+        },
+      },
+    ])
+    let totalIncome = null
+    profit.length
+      ? (totalIncome = profit[0].totalIncome.toFixed(2))
+      : (totalIncome = 0)
 
-        const result = { spending: totalSpen, income: totalIncomes, month: Number(month), year: Number(year) };
-        return result;
-    };
+    const result = {
+      year: Number(year),
+      month: Number(month),
+      income: totalIncome,
+      spending: totalSpending,
+    }
 
-    // del transaction
+    return result
+  }
 
-    async remove(userId, transactionId) {
-            const result = await Transaction.findOneAndRemove({ _id: transactionId, owner: userId });
-        return result;
-    };
-};
- 
-const transactionService = new TransactionService;
+  async listMonth(userId, year, month, income) {
+    const total = await Transaction.find({
+      owner: userId,
+      year: Number(year),
+      month: Number(month),
+      income,
+    }).countDocuments()
+    const result = await Transaction.find({
+      owner: userId,
+      year: Number(year),
+      month: Number(month),
+      income,
+    })
 
-export default transactionService;
+    const amounts = await this.transactionsMonthSum(userId, year, month)
+    return {
+      total,
+      amounts: amounts,
+      transactions: result,
+    }
+  }
+
+  async summary(userId) {
+    const date = new Date()
+    const currentMonth = date.getMonth()
+    const currentYear = date.getFullYear()
+    console.log("currentMonth=", currentMonth, "currentYear=", currentYear)
+    const amounts = []
+    for (let i = 0; i < 6; i += 1) {
+      let previousMonth = currentMonth
+      let previousYear = currentYear
+      previousMonth -= i
+      if (previousMonth < 0) {
+        previousMonth = previousMonth + 12
+        previousYear = previousYear - 1
+      }
+      const amount = await this.transactionsMonthSum(
+        userId,
+        previousYear,
+        previousMonth
+      )
+      amounts.push(amount)
+    }
+    return { summary: amounts }
+  }
+
+  async remove(userId, transactionId) {
+    const result = await Transaction.findOneAndRemove({
+      _id: transactionId,
+      owner: userId,
+    })
+    return result
+  }
+}
+
+const transactionService = new TransactionService()
+
+export default transactionService
