@@ -96,16 +96,14 @@ class AuthControllers {
       const tokenForNewUser = authService.getToken(newUser)
       await authService.setToken(newUser.id, tokenForNewUser)
       const isNewUser = await userService.findByEmail(newUser.email)
-
       return res.redirect(
-        `${process.env.FRONTEND_URL}/dashboard?${isNewUser}&newToken=${tokenForNewUser}`
+        `${process.env.FRONTEND_URL}/dashboard?user=${isNewUser}&newToken=${tokenForNewUser}`
       )
     }
     const newToken = await authService.getToken(isUserExist)
     await authService.updateToken(isUserExist.id, newToken)
-
     return res.redirect(
-      `${process.env.FRONTEND_URL}/dashboard?${isUserExist}&newToken=${newToken}`
+      `${process.env.FRONTEND_URL}/dashboard?user=${isUserExist}&newToken=${newToken}`
     )
   }
 }
