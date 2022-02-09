@@ -76,6 +76,21 @@ class TransactionControllers {
       data: { ...summaries },
     })
   }
+
+  async transactionsStats(req, res, next) {
+    const { id: userId } = req.user
+    const { month, year } = req.body
+    const stats = await transactionService.monthCategoryStats(
+      userId,
+      year,
+      month
+    )
+    res.status(httpCodes.OK).json({
+      status: "success",
+      code: httpCodes.OK,
+      data: { ...stats },
+    })
+  }
 }
 
 const transactionControllers = new TransactionControllers()
