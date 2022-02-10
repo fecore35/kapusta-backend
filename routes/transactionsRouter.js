@@ -37,7 +37,13 @@ router.get(
 router.get(
   "/stats",
   [guard, validateQuery],
-  transactionControllers.transactionsStats
+  transactionControllers.transactionsCategoryStats
+)
+
+router.get(
+  "/description",
+  [guard, validateQuery],
+  transactionControllers.transactionsDescriptionStats
 )
 
 export default router
