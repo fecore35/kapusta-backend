@@ -29,37 +29,41 @@ class TransactionService {
     return { result, balance: newBalance }
   }
 
-  async list(
-    userId,
-    { sortBy, sortByDesc, page = 1, filter, limit = 1000 },
-    isAdmin
-  ) {
-    let sortCriteria = null
-    let total = await Transaction.find({ owner: userId }).countDocuments()
-    isAdmin && (total = await Transaction.find().countDocuments())
-    let result = null
-    isAdmin
-      ? (result = Transaction.find().populate({
-          path: "owner",
-          select: "name email  role subscription",
-        }))
-      : (result = Transaction.find({ owner: userId }).populate({
-          path: "owner",
-          select: "name email  role subscription",
-        }))
+  async list(userId, { page = 1, filter, limit = 1000 }) {
+    const total = await Transaction.find({ owner: userId }).countDocuments()
 
-    sortBy && (sortCriteria = { [`${sortBy}`]: 1 })
-    sortByDesc && (sortCriteria = { [`${sortByDesc}`]: -1 })
-    filter && (result = result.select(filter.split("|").join(" ")))
+    let resultIncome = Transaction.find({
+      owner: userId,
+      income: true,
+    }).populate({
+      path: "owner",
+      select: "name email  role subscription",
+    })
+    filter && (resultIncome = resultIncome.select(filter.split("|").join(" ")))
     page < 0 && (page = 1)
     ;(Number(page) - 1) * Number(limit) > total &&
       (page = Math.ceil(total / Number(limit)))
-
-    result = await result
+    resultIncome = await resultIncome
       .skip((Number(page) - 1) * Number(limit))
       .limit(Number(limit))
-      .sort(sortCriteria)
-    return { total, page, transaction: result }
+
+    let resultSpending = Transaction.find({
+      owner: userId,
+      income: false,
+    }).populate({
+      path: "owner",
+      select: "name email  role subscription",
+    })
+    filter &&
+      (resultSpending = resultSpending.select(filter.split("|").join(" ")))
+    page < 0 && (page = 1)
+    ;(Number(page) - 1) * Number(limit) > total &&
+      (page = Math.ceil(total / Number(limit)))
+    resultSpending = await resultSpending
+      .skip((Number(page) - 1) * Number(limit))
+      .limit(Number(limit))
+
+    return { total, page, income: resultIncome, spending: resultSpending }
   }
 
   async transactionsMonthSum(userId, year, month) {
@@ -180,7 +184,7 @@ class TransactionService {
             owner: Types.ObjectId(userId),
             year: Number(year),
             month: Number(month),
-            category: item,
+            category: item.slug,
           },
         },
         {
@@ -194,7 +198,8 @@ class TransactionService {
       sum.length ? (totalSum = sum[0].totalSum.toFixed(2)) : (totalSum = 0)
 
       const result = {
-        category: item,
+        name: item.name,
+        slug: item.slug,
         totalSum: totalSum,
       }
 
