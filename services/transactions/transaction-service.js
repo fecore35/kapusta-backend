@@ -211,6 +211,56 @@ class TransactionService {
       categoriesSum: categoriesSumArr,
     }
   }
+
+  async monthDescriptionStats(userId, year, month, category) {
+    const transactions = await Transaction.find({
+      owner: userId,
+      year,
+      month,
+      category,
+    })
+    const uniqueDescriptions = [
+      ...new Set(transactions.map((item) => item.description)),
+    ]
+
+    const descriptionsSumArr = []
+    for (const item of uniqueDescriptions) {
+      const sum = await Transaction.aggregate([
+        {
+          $match: {
+            owner: Types.ObjectId(userId),
+            year: Number(year),
+            month: Number(month),
+            category,
+            description: item,
+          },
+        },
+        {
+          $group: {
+            _id: "descriptions-qwe",
+            totalSum: { $sum: "$sum" },
+          },
+        },
+      ])
+      let totalSum = null
+      sum.length ? (totalSum = sum[0].totalSum.toFixed(2)) : (totalSum = 0)
+
+      const result = {
+        name: item,
+        sum: totalSum,
+      }
+
+      descriptionsSumArr.push(result)
+    }
+
+    return {
+      year: Number(year),
+      month: Number(month),
+      category,
+      descriptions: uniqueDescriptions,
+      descriptionsSum: descriptionsSumArr,
+    }
+  }
 }
 
 const transactionService = new TransactionService()

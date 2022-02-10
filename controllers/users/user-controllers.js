@@ -21,7 +21,7 @@ class UserControllers {
     soughtUser
       ? res
           .status(httpCodes.OK)
-          .json({ status: "success", code: httpCodes.OK, data: { result } })
+          .json({ status: "success", code: httpCodes.OK, data: { ...result } })
       : res.status(httpCodes.NOT_FOUND).json({
           status: "error",
           code: httpCodes.NOT_FOUND,
