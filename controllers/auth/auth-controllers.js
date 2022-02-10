@@ -50,7 +50,7 @@ class AuthControllers {
   async googleAuth(req, res) {
     const stringifiedParams = queryString.stringify({
       client_id: process.env.GOOGLE_CLIENT_ID,
-      redirect_uri: `${process.env.BASE_URL}/api/auth/google-redirect`,
+      redirect_uri: `${process.env.BASE_URL}/auth/google-redirect`,
       scope: [
         "https://www.googleapis.com/auth/userinfo.email",
         "https://www.googleapis.com/auth/userinfo.profile",
@@ -76,7 +76,7 @@ class AuthControllers {
       data: {
         client_id: process.env.GOOGLE_CLIENT_ID,
         client_secret: process.env.GOOGLE_CLIENT_SECRET,
-        redirect_uri: `${process.env.BASE_URL}/api/auth/google-redirect`,
+        redirect_uri: `${process.env.BASE_URL}/auth/google-redirect`,
         grant_type: "authorization_code",
         code,
       },
@@ -92,14 +92,18 @@ class AuthControllers {
 
     const isUserExist = await userService.findByEmail(userData.data.email)
     if (!isUserExist) {
-      return await userService.create(userData.data)
+      const newUser = await userService.create(userData.data)
+      const tokenForNewUser = authService.getToken(newUser)
+      await authService.setToken(newUser.id, tokenForNewUser)
+      const isNewUser = await userService.findByEmail(newUser.email)
+      return res.redirect(
+        `${process.env.FRONTEND_URL}/dashboard?user=${isNewUser}&newToken=${tokenForNewUser}`
+      )
     }
     const newToken = await authService.getToken(isUserExist)
     await authService.updateToken(isUserExist.id, newToken)
-    // console.log(isUserExist)
-
     return res.redirect(
-      `${process.env.FRONTEND_URL}/home?${isUserExist}&newToken=${newToken}`
+      `${process.env.FRONTEND_URL}/dashboard?user=${isUserExist}&newToken=${newToken}`
     )
   }
 }
