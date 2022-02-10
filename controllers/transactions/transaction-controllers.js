@@ -37,12 +37,12 @@ class TransactionControllers {
   async delTransaction(req, res, next) {
     const { id } = req.params
     const { id: userId } = req.user
-    const deletedContact = await transactionService.remove(userId, id)
-    deletedContact
+    const deletedTransaction = await transactionService.remove(userId, id)
+    deletedTransaction
       ? res.status(httpCodes.OK).json({
           status: "success",
           code: httpCodes.OK,
-          data: { deletedContact },
+          data: { deletedTransaction },
         })
       : res.status(httpCodes.NOT_FOUND).json({
           status: "error",

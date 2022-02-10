@@ -11,7 +11,7 @@
   },
   "consumes": ["application/json"],
   "produces": ["application/json"],
-  "servers": [{ "url": "http://localhost:3030" }, {}],
+  "servers": [{ "url": "http://localhost:5000" }, {}],
   "tags": [
     {
       "name": "Auth",
@@ -283,10 +283,17 @@
       "put": {
         "tags": ["Users"],
         "summary": "Users info only for ADMIN",
-        "parameters": [],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "type": "string",
+            "description": "User's id"
+          }
+        ],
         "security": [{ "Bearer": [] }],
         "requestBody": {
-          "description": "Registration's object",
+          "description": "Update users info",
           "required": false,
           "content": {
             "application/json": {
@@ -298,7 +305,7 @@
         },
         "responses": {
           "201": {
-            "description": "Successful operation",
+            "description": "success",
             "content": {
               "application/json": {
                 "schema": {
@@ -311,8 +318,8 @@
             "description": "Bad request (invalid request body)",
             "content": {}
           },
-          "409": {
-            "description": "Provided email already exists",
+          "403": {
+            "description": "Access is denied",
             "content": {}
           }
         }
@@ -325,33 +332,23 @@
         "parameters": [],
         "security": [{ "Bearer": [] }],
         "requestBody": {
-          "description": "Registration's object",
-          "required": false,
+          "description": "Update user`s balance",
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/RegistrationRequest"
+                "$ref": "#/components/schemas/UpdateBalanceRequest"
               }
             }
           }
         },
         "responses": {
-          "201": {
-            "description": "Successful operation",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RegistrationResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request (invalid request body)",
+          "200": {
+            "description": "success",
             "content": {}
           },
-          "409": {
-            "description": "Provided email already exists",
+          "404": {
+            "description": "Not Found",
             "content": {}
           }
         }
@@ -364,34 +361,20 @@
         "parameters": [],
         "security": [{ "Bearer": [] }],
         "requestBody": {
-          "description": "Registration's object",
+          "description": "transactions's object",
           "required": false,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RegistrationRequest"
-              }
-            }
-          }
+          "content": {}
         },
         "responses": {
-          "201": {
-            "description": "Successful operation",
+          "200": {
+            "description": "success",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RegistrationResponse"
+                  "$ref": "#/components/schemas/TransactionsResponse"
                 }
               }
             }
-          },
-          "400": {
-            "description": "Bad request (invalid request body)",
-            "content": {}
-          },
-          "409": {
-            "description": "Provided email already exists",
-            "content": {}
           }
         }
       },
@@ -401,34 +384,26 @@
         "parameters": [],
         "security": [{ "Bearer": [] }],
         "requestBody": {
-          "description": "Registration's object",
-          "required": false,
+          "description": "Create transaction object",
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/RegistrationRequest"
+                "$ref": "#/components/schemas/CreateNewTransactionRequest"
               }
             }
           }
         },
         "responses": {
           "201": {
-            "description": "Successful operation",
+            "description": "success",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RegistrationResponse"
+                  "$ref": "#/components/schemas/CreateNewTransactionResponse"
                 }
               }
             }
-          },
-          "400": {
-            "description": "Bad request (invalid request body)",
-            "content": {}
-          },
-          "409": {
-            "description": "Provided email already exists",
-            "content": {}
           }
         }
       }
@@ -436,38 +411,110 @@
     "/transactions/:id": {
       "delete": {
         "tags": ["Transactions"],
-        "summary": "Delete Transactions only for ADMIN",
-        "parameters": [],
+        "summary": "Delete Transactions",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "type": "string",
+            "description": "Transaction`s id"
+          }
+        ],
         "security": [{ "Bearer": [] }],
         "requestBody": {
-          "description": "Registration's object",
+          "description": "Delete Transactions object",
           "required": false,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RegistrationRequest"
-              }
-            }
-          }
+          "content": {}
         },
         "responses": {
-          "201": {
-            "description": "Successful operation",
+          "200": {
+            "description": "success",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RegistrationResponse"
+                  "$ref": "#/components/schemas/DeleteTransactionResponse"
                 }
               }
             }
           },
-          "400": {
-            "description": "Bad request (invalid request body)",
+          "404": {
+            "description": "Not Found",
             "content": {}
-          },
-          "409": {
-            "description": "Provided email already exists",
-            "content": {}
+          }
+        }
+      }
+    },
+    "/transactions/month": {
+      "get": {
+        "tags": ["Transactions"],
+        "summary": "Get transactions",
+        "parameters": [],
+        "security": [{ "Bearer": [] }],
+        "requestBody": {
+          "description": "transactions's object",
+          "required": false,
+          "content": {}
+        },
+        "responses": {
+          "200": {
+            "description": "success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransactionsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/transactions/summary": {
+      "get": {
+        "tags": ["Transactions"],
+        "summary": "Get transactions",
+        "parameters": [],
+        "security": [{ "Bearer": [] }],
+        "requestBody": {
+          "description": "transactions's object",
+          "required": false,
+          "content": {}
+        },
+        "responses": {
+          "200": {
+            "description": "success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransactionsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/transactions/stats": {
+      "get": {
+        "tags": ["Transactions"],
+        "summary": "Get transactions",
+        "parameters": [],
+        "security": [{ "Bearer": [] }],
+        "requestBody": {
+          "description": "transactions's object",
+          "required": false,
+          "content": {}
+        },
+        "responses": {
+          "200": {
+            "description": "success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransactionsResponse"
+                }
+              }
+            }
           }
         }
       }
@@ -759,13 +806,510 @@
             "updatedAt": "2022-02-04T13:27:07.976Z"
           }
         }
-      }
-    },
-    "securitySchemes": {
-      "Bearer": {
-        "type": "http",
-        "scheme": "bearer",
-        "bearerFormat": "JWT"
+      },
+      "UpdateBalanceRequest": {
+        "type": "object",
+        "required": ["id", "balance"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "User's id",
+            "example": "6203e5d64ead3ad7e96a1283"
+          },
+          "balance": {
+            "type": "number",
+            "description": "User's balance",
+            "example": "5000"
+          }
+        }
+      },
+      "TransactionsResponse": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "description": "Count user`s transactions",
+            "example": "25"
+          },
+          "page": {
+            "type": "integer",
+            "description": "Count user`s page",
+            "example": "2"
+          },
+          "income": {
+            "type": "array",
+            "properties": {
+              "items": {
+                "type": "object",
+                "properties": {
+                  "day": {
+                    "type": "integer",
+                    "description": "Day",
+                    "example": "10"
+                  },
+                  "month": {
+                    "type": "integer",
+                    "description": "Month",
+                    "example": "1"
+                  },
+                  "year": {
+                    "type": "integer",
+                    "description": "Year",
+                    "example": "2022"
+                  },
+                  "sum": {
+                    "type": "number",
+                    "description": "Sum",
+                    "example": "15000"
+                  },
+                  "income": {
+                    "type": "boolean",
+                    "example": true
+                  },
+                  "category": {
+                    "type": "string",
+                    "description": "Category",
+                    "example": "salary"
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "Description",
+                    "example": "зарплата"
+                  },
+                  "owner": {
+                    "type": "object",
+                    "properties": {
+                      "_id": {
+                        "type": "string",
+                        "description": "User's id",
+                        "example": "62021d2c34b879a2b5970f37"
+                      },
+                      "name": {
+                        "type": "string",
+                        "description": "User's name",
+                        "example": "Rostik"
+                      },
+                      "email": {
+                        "type": "string",
+                        "description": "User's email",
+                        "example": "user1@ordy.com",
+                        "format": "email"
+                      },
+                      "role": {
+                        "type": "string",
+                        "description": "User's role",
+                        "example": "user"
+                      }
+                    }
+                  },
+                  "createdAt": {
+                    "type": "string",
+                    "description": "User`s data created",
+                    "example": "2022-02-04T06:27:31.669Z"
+                  },
+                  "updateAt": {
+                    "type": "string",
+                    "description": "User`s data updated",
+                    "example": "2022-02-04T06:27:31.669Z"
+                  },
+                  "id": {
+                    "type": "string",
+                    "description": "User's id",
+                    "example": "62025fac12117b1ff96783a2"
+                  }
+                }
+              }
+            },
+            "example": [
+              {
+                "day": 10,
+                "month": 1,
+                "year": 2021,
+                "sum": 15000,
+                "income": true,
+                "category": "salary",
+                "description": "зарплата",
+                "owner": {
+                  "_id": "62021d2c34b879a2b5970f37",
+                  "name": "TEST",
+                  "email": "test@mail.com",
+                  "role": "user"
+                },
+                "createdAt": "2022-02-08T07:39:12.227Z",
+                "updatedAt": "2022-02-08T07:39:12.227Z",
+                "id": "62021e2034b879a2b5970f57"
+              },
+              {
+                "day": 15,
+                "month": 1,
+                "year": 2021,
+                "sum": 1000,
+                "income": true,
+                "category": "addition",
+                "description": "дали родители",
+                "owner": {
+                  "_id": "62021d2c34b879a2b5970f37",
+                  "name": "TEST",
+                  "email": "test@mail.com",
+                  "role": "user"
+                },
+                "createdAt": "2022-02-08T07:40:47.831Z",
+                "updatedAt": "2022-02-08T07:40:47.831Z",
+                "id": "62021e7f34b879a2b5970f5d"
+              }
+            ]
+          },
+          "spending": {
+            "type": "array",
+            "properties": {
+              "items": {
+                "type": "object",
+                "properties": {
+                  "day": {
+                    "type": "integer",
+                    "description": "Day",
+                    "example": "10"
+                  },
+                  "month": {
+                    "type": "integer",
+                    "description": "Month",
+                    "example": "1"
+                  },
+                  "year": {
+                    "type": "integer",
+                    "description": "Year",
+                    "example": "2022"
+                  },
+                  "sum": {
+                    "type": "number",
+                    "description": "Sum",
+                    "example": "15000"
+                  },
+                  "income": {
+                    "type": "boolean",
+                    "example": false
+                  },
+                  "category": {
+                    "type": "string",
+                    "description": "Category",
+                    "example": "salary"
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "Description",
+                    "example": "зарплата"
+                  },
+                  "owner": {
+                    "type": "object",
+                    "properties": {
+                      "_id": {
+                        "type": "string",
+                        "description": "User's id",
+                        "example": "62021d2c34b879a2b5970f37"
+                      },
+                      "name": {
+                        "type": "string",
+                        "description": "User's name",
+                        "example": "Rostik"
+                      },
+                      "email": {
+                        "type": "string",
+                        "description": "User's email",
+                        "example": "user1@ordy.com",
+                        "format": "email"
+                      },
+                      "role": {
+                        "type": "string",
+                        "description": "User's role",
+                        "example": "user"
+                      }
+                    }
+                  },
+                  "createdAt": {
+                    "type": "string",
+                    "description": "User`s data created",
+                    "example": "2022-02-04T06:27:31.669Z"
+                  },
+                  "updateAt": {
+                    "type": "string",
+                    "description": "User`s data updated",
+                    "example": "2022-02-04T06:27:31.669Z"
+                  },
+                  "id": {
+                    "type": "string",
+                    "description": "User's id",
+                    "example": "62025fac12117b1ff96783a2"
+                  }
+                }
+              }
+            },
+            "example": [
+              {
+                "day": 10,
+                "month": 1,
+                "year": 2021,
+                "sum": 15000,
+                "income": false,
+                "category": "salary",
+                "description": "зарплата",
+                "owner": {
+                  "_id": "62021d2c34b879a2b5970f37",
+                  "name": "TEST",
+                  "email": "test@mail.com",
+                  "role": "user"
+                },
+                "createdAt": "2022-02-08T07:39:12.227Z",
+                "updatedAt": "2022-02-08T07:39:12.227Z",
+                "id": "62021e2034b879a2b5970f57"
+              },
+              {
+                "day": 15,
+                "month": 1,
+                "year": 2021,
+                "sum": 1000,
+                "income": false,
+                "category": "addition",
+                "description": "дали родители",
+                "owner": {
+                  "_id": "62021d2c34b879a2b5970f37",
+                  "name": "TEST",
+                  "email": "test@mail.com",
+                  "role": "user"
+                },
+                "createdAt": "2022-02-08T07:40:47.831Z",
+                "updatedAt": "2022-02-08T07:40:47.831Z",
+                "id": "62021e7f34b879a2b5970f5d"
+              }
+            ]
+          }
+        }
+      },
+      "CreateNewTransactionRequest": {
+        "type": "object",
+        "properties": {
+          "day": {
+            "type": "integer",
+            "description": "Day",
+            "example": "10"
+          },
+          "month": {
+            "type": "integer",
+            "description": "Month",
+            "example": "1"
+          },
+          "year": {
+            "type": "integer",
+            "description": "Year",
+            "example": "2022"
+          },
+          "sum": {
+            "type": "number",
+            "description": "Sum",
+            "example": "15000"
+          },
+          "income": {
+            "type": "boolean",
+            "example": true
+          },
+          "category": {
+            "type": "string",
+            "description": "Category",
+            "example": "salary"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description",
+            "example": "зарплата"
+          }
+        },
+        "example": {
+          "day": "24",
+          "month": "1",
+          "year": "2022",
+          "sum": "1200.62",
+          "income": false,
+          "category": "foods",
+          "description": "супермаркет"
+        }
+      },
+      "CreateNewTransactionResponse": {
+        "type": "object",
+        "properties": {
+          "newTransaction": {
+            "type": "object",
+            "properties": {
+              "result": {
+                "type": "object",
+                "properties": {
+                  "day": {
+                    "type": "integer",
+                    "description": "Day",
+                    "example": "10"
+                  },
+                  "month": {
+                    "type": "integer",
+                    "description": "Month",
+                    "example": "1"
+                  },
+                  "year": {
+                    "type": "integer",
+                    "description": "Year",
+                    "example": "2022"
+                  },
+                  "sum": {
+                    "type": "number",
+                    "description": "Sum",
+                    "example": "15000"
+                  },
+                  "income": {
+                    "type": "boolean",
+                    "example": true
+                  },
+                  "category": {
+                    "type": "string",
+                    "description": "Category",
+                    "example": "salary"
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "Description",
+                    "example": "зарплата"
+                  },
+                  "owner": {
+                    "type": "string",
+                    "description": "Owner`s id",
+                    "example": "61ff7141032d06598b989916"
+                  },
+                  "createdAt": {
+                    "type": "string",
+                    "description": "User`s data created",
+                    "example": "2022-02-04T06:27:31.669Z"
+                  },
+                  "updateAt": {
+                    "type": "string",
+                    "description": "User`s data updated",
+                    "example": "2022-02-04T06:27:31.669Z"
+                  },
+                  "id": {
+                    "type": "string",
+                    "description": "User's id",
+                    "example": "62025fac12117b1ff96783a2"
+                  }
+                },
+                "balance": {
+                  "type": "number",
+                  "description": "Current user`s balance ",
+                  "example": "5000"
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "newTransaction": {
+            "result": {
+              "day": 24,
+              "month": 1,
+              "year": 2022,
+              "sum": 1200.62,
+              "income": false,
+              "category": "foods",
+              "description": "супермаркет",
+              "owner": "61ff7141032d06598b989916",
+              "createdAt": "2022-02-06T11:57:39.994Z",
+              "updatedAt": "2022-02-06T11:57:39.994Z",
+              "id": "61ffb7b379f89b62195b9836"
+            },
+            "balance": 1200.62
+          }
+        }
+      },
+      "DeleteTransactionResponse": {
+        "type": "object",
+        "properties": {
+          "deletedTransaction": {
+            "type": "object",
+            "properties": {
+              "day": {
+                "type": "integer",
+                "description": "Day",
+                "example": "10"
+              },
+              "month": {
+                "type": "integer",
+                "description": "Month",
+                "example": "1"
+              },
+              "year": {
+                "type": "integer",
+                "description": "Year",
+                "example": "2022"
+              },
+              "sum": {
+                "type": "number",
+                "description": "Sum",
+                "example": "15000"
+              },
+              "income": {
+                "type": "boolean",
+                "example": true
+              },
+              "category": {
+                "type": "string",
+                "description": "Category",
+                "example": "salary"
+              },
+              "description": {
+                "type": "string",
+                "description": "Description",
+                "example": "зарплата"
+              },
+              "owner": {
+                "type": "string",
+                "description": "Owner`s id",
+                "example": "61ff7141032d06598b989916"
+              },
+              "createdAt": {
+                "type": "string",
+                "description": "User`s data created",
+                "example": "2022-02-04T06:27:31.669Z"
+              },
+              "updateAt": {
+                "type": "string",
+                "description": "User`s data updated",
+                "example": "2022-02-04T06:27:31.669Z"
+              },
+              "id": {
+                "type": "string",
+                "description": "User's id",
+                "example": "62025fac12117b1ff96783a2"
+              }
+            }
+          }
+        },
+        "example": {
+          "deletedTransaction": {
+            "day": 15,
+            "month": 1,
+            "year": 2021,
+            "sum": 1000,
+            "income": true,
+            "category": "addition",
+            "description": "дали родители",
+            "owner": "62021d2c34b879a2b5970f37",
+            "createdAt": "2022-02-08T07:40:47.831Z",
+            "updatedAt": "2022-02-08T07:40:47.831Z",
+            "id": "62021e7f34b879a2b5970f5d"
+          }
+        }
+      },
+
+      "securitySchemes": {
+        "Bearer": {
+          "type": "http",
+          "scheme": "bearer",
+          "bearerFormat": "JWT"
+        }
       }
     }
   }
