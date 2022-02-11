@@ -447,13 +447,19 @@
     "/transactions/month": {
       "get": {
         "tags": ["Transactions"],
-        "summary": "Get transactions",
+        "summary": "Get transactions per month",
         "parameters": [],
         "security": [{ "Bearer": [] }],
         "requestBody": {
           "description": "transactions's object",
           "required": false,
-          "content": {}
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TransactionsPerMonthRequest"
+              }
+            }
+          }
         },
         "responses": {
           "200": {
@@ -461,7 +467,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/TransactionsResponse"
+                  "$ref": "#/components/schemas/TransactionsPerMonthResponse"
                 }
               }
             }
@@ -486,7 +492,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/TransactionsResponse"
+                  "$ref": "#/components/schemas/SummaryResponse"
                 }
               }
             }
@@ -503,7 +509,13 @@
         "requestBody": {
           "description": "transactions's object",
           "required": false,
-          "content": {}
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StatsRequest"
+              }
+            }
+          }
         },
         "responses": {
           "200": {
@@ -511,7 +523,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/TransactionsResponse"
+                  "$ref": "#/components/schemas/StatsResponse"
                 }
               }
             }
@@ -1301,6 +1313,299 @@
             "updatedAt": "2022-02-08T07:40:47.831Z",
             "id": "62021e7f34b879a2b5970f5d"
           }
+        }
+      },
+      "TransactionsPerMonthRequest": {
+        "type": "object",
+        "required": ["month", "year", "income"],
+        "properties": {
+          "month": {
+            "type": "integer",
+            "description": "month",
+            "example": "1"
+          },
+          "year": {
+            "type": "integer",
+            "description": "year",
+            "example": "2022"
+          },
+          "income": {
+            "type": "boolean",
+            "description": " on income - true",
+            "example": "true"
+          }
+        }
+      },
+      "TransactionsPerMonthResponse": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "description": "transactions's object",
+            "example": "2"
+          },
+          "amount": {
+            "type": "object",
+            "properties": {
+              "year": {
+                "type": "integer",
+                "description": "Year",
+                "example": "2022"
+              },
+              "month": {
+                "type": "integer",
+                "description": "Month",
+                "example": "1"
+              },
+              "income": {
+                "type": "number",
+                "description": "Sum income",
+                "example": "15000"
+              },
+              "spending": {
+                "type": "number",
+                "description": "Sum spending",
+                "example": "5020"
+              }
+            }
+          },
+          "transactions": {
+            "type": "array",
+            "properties": {
+              "items": {
+                "type": "object",
+                "properties": {
+                  "day": {
+                    "type": "integer",
+                    "description": "Day",
+                    "example": "10"
+                  },
+                  "month": {
+                    "type": "integer",
+                    "description": "Month",
+                    "example": "1"
+                  },
+                  "year": {
+                    "type": "integer",
+                    "description": "Year",
+                    "example": "2022"
+                  },
+                  "sum": {
+                    "type": "number",
+                    "description": "Sum",
+                    "example": "15000"
+                  },
+                  "income": {
+                    "type": "boolean",
+                    "example": true
+                  },
+                  "category": {
+                    "type": "string",
+                    "description": "Category",
+                    "example": "salary"
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "Description",
+                    "example": "зарплата"
+                  },
+                  "owner": {
+                    "type": "string",
+                    "description": "owner`s id",
+                    "example": "62021d2c34b879a2b5970f37"
+                  },
+                  "createdAt": {
+                    "type": "string",
+                    "description": "User`s data created",
+                    "example": "2022-02-04T06:27:31.669Z"
+                  },
+                  "updateAt": {
+                    "type": "string",
+                    "description": "User`s data updated",
+                    "example": "2022-02-04T06:27:31.669Z"
+                  },
+                  "id": {
+                    "type": "string",
+                    "description": "Transaction`s id",
+                    "example": "62025fac12117b1ff96783a2"
+                  }
+                }
+              }
+            },
+            "example": [
+              {
+                "day": 8,
+                "month": 1,
+                "year": 2021,
+                "sum": 523.57,
+                "income": false,
+                "category": "foods",
+                "description": "супермаркет",
+                "owner": "62021d2c34b879a2b5970f37",
+                "createdAt": "2022-02-08T09:06:16.222Z",
+                "updatedAt": "2022-02-08T09:06:16.222Z",
+                "id": "6202328834b879a2b5970f74"
+              },
+              {
+                "day": 10,
+                "month": 1,
+                "year": 2021,
+                "sum": 340.5,
+                "income": false,
+                "category": "foods",
+                "description": "рынок",
+                "owner": "62021d2c34b879a2b5970f37",
+                "createdAt": "2022-02-08T09:07:18.749Z",
+                "updatedAt": "2022-02-08T09:07:18.749Z",
+                "id": "620232c634b879a2b5970f79"
+              }
+            ]
+          }
+        }
+      },
+      "SummaryResponse": {
+        "type": "object",
+        "properties": {
+          "type": "array",
+          "properties": {
+            "items": {
+              "type": "object",
+              "properties": {
+                "year": {
+                  "type": "integer",
+                  "description": "Year",
+                  "example": "2022"
+                },
+                "month": {
+                  "type": "integer",
+                  "description": "Month",
+                  "example": "1"
+                },
+                "income": {
+                  "type": "number",
+                  "description": "Sum income",
+                  "example": "15000.00"
+                },
+                "spending": {
+                  "type": "number",
+                  "description": "Sum spending",
+                  "example": "3600.23"
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "summary": [
+            {
+              "year": 2022,
+              "month": 1,
+              "income": "15000.00",
+              "spending": "3670.23"
+            },
+            {
+              "year": 2022,
+              "month": 0,
+              "income": "12000.00",
+              "spending": 0
+            }
+          ]
+        }
+      },
+      "StatsRequest": {
+        "type": "object",
+        "required": ["month", "year"],
+        "properties": {
+          "month": {
+            "type": "integer",
+            "description": "month",
+            "example": "1"
+          },
+          "year": {
+            "type": "integer",
+            "description": "year",
+            "example": "2022"
+          }
+        }
+      },
+      "StatsResponse": {
+        "type": "object",
+        "properties": {
+          "amounts": {
+            "type": "object",
+            "properties": {
+              "year": {
+                "type": "integer",
+                "description": "Year",
+                "example": "2022"
+              },
+              "month": {
+                "type": "integer",
+                "description": "Month",
+                "example": "1"
+              },
+              "income": {
+                "type": "number",
+                "description": "Sum income",
+                "example": "15000"
+              },
+              "spending": {
+                "type": "number",
+                "description": "Sum spending",
+                "example": "5020"
+              }
+            }
+          },
+          "categoriesSum": {
+            "type": "array",
+            "properties": {
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "name",
+                    "example": "ТРАНСПОРТ"
+                  },
+                  "slug": {
+                    "type": "string",
+                    "description": "slug",
+                    "example": "transport"
+                  },
+                  "totalSum": {
+                    "type": "number",
+                    "description": "totalSum",
+                    "example": "1693.57"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "amounts": {
+            "year": 2021,
+            "month": 1,
+            "income": "15000.00",
+            "spending": "1693.57"
+          },
+          "categoriesSum": [
+            {
+              "name": "ТРАНСПОРТ",
+              "slug": "transport",
+              "totalSum": 0
+            },
+            {
+              "name": "ПРДУКТЫ",
+              "slug": "foods",
+              "totalSum": "1693.57"
+            },
+            {
+              "name": "ЗДОРОВЬЕ",
+              "slug": "health",
+              "totalSum": 0
+            }
+          ]
         }
       },
 
