@@ -345,7 +345,13 @@
         "responses": {
           "200": {
             "description": "success",
-            "content": {}
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateBalanceResponse"
+                }
+              }
+            }
           },
           "404": {
             "description": "Not Found",
@@ -530,6 +536,37 @@
           }
         }
       }
+    },
+    "/transactions/description": {
+      "get": {
+        "tags": ["Transactions"],
+        "summary": "Get transaction`s description",
+        "parameters": [],
+        "security": [{ "Bearer": [] }],
+        "requestBody": {
+          "description": "transactions's object",
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DescriptionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DescriptionResponse"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -601,10 +638,25 @@
       "LoginResponse": {
         "type": "object",
         "properties": {
+          "name": {
+            "type": "string",
+            "description": "User's name",
+            "example": "TEST"
+          },
           "id": {
             "type": "string",
             "description": "User's id",
             "example": "62025fac12117b1ff96783a2"
+          },
+          "balance": {
+            "type": "number",
+            "description": "User's balance",
+            "example": "12600.30"
+          },
+          "rebalancing": {
+            "type": "boolean",
+            "description": "On/Off update balance",
+            "example": "false"
           },
           "token": {
             "type": "string",
@@ -613,8 +665,11 @@
           }
         },
         "example": {
-          "id": "62025fac12117b1ff96783a2",
-          "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyMDI1ZmFjMTIxMTdiMWZmOTY3ODNhMiIsImlhdCI6MTY0NDMyMzc5MSwiZXhwIjoxNjQ0MzY2OTkxfQ.23Y08DlB-pO8B0WLfQ2pfDe3obl5tOAZ7AyWXpHXKRY"
+          "name": "TEST",
+          "id": "62021d2c34b879a2b5970f37",
+          "balance": 120636.2,
+          "rebalancing": false,
+          "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYxZmY3MTQxMDMyZDA2NTk4Yjk4OTkxNiIsImlhdCI6MTY0NDE0OTE5NywiZXhwIjoxNjQ0MTkyMzk3fQ.N6gKf1yhlpyqGAriL54vBzf7AOCuOcMb8m8FgcShpyQ"
         }
       },
       "GetUsersResponse": {
@@ -832,6 +887,16 @@
             "type": "number",
             "description": "User's balance",
             "example": "5000"
+          }
+        }
+      },
+      "UpdateBalanceResponse": {
+        "type": "object",
+        "properties": {
+          "balance": {
+            "type": "number",
+            "description": "User's balance",
+            "example": "15000 or Balance value must be positive"
           }
         }
       },
@@ -1604,6 +1669,83 @@
               "name": "ЗДОРОВЬЕ",
               "slug": "health",
               "totalSum": 0
+            }
+          ]
+        }
+      },
+      "DescriptionResponse": {
+        "type": "object",
+        "properties": {
+          "year": {
+            "type": "integer",
+            "description": "Year",
+            "example": "2022"
+          },
+          "month": {
+            "type": "integer",
+            "description": "Month",
+            "example": "1"
+          },
+          "category": {
+            "type": "string",
+            "description": "category name",
+            "example": "foods"
+          },
+          "descriptions": {
+            "type": "array",
+            "properties": {
+              "items": {
+                "type": "string",
+                "description": "Description category"
+              }
+            }
+          },
+          "descriptionsSum": {
+            "type": "array",
+            "properties": {
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "name",
+                    "example": "ТРАНСПОРТ"
+                  },
+                  "sum": {
+                    "type": "number",
+                    "description": "sum",
+                    "example": "2080.23"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "year": 2022,
+          "month": 1,
+          "category": "foods",
+          "descriptions": ["супермаркет", "мясо", "сигареты", "кофе", "рынок"],
+          "descriptionsSum": [
+            {
+              "name": "супермаркет",
+              "sum": "2080.23"
+            },
+            {
+              "name": "мясо",
+              "sum": "520.00"
+            },
+            {
+              "name": "сигареты",
+              "sum": "320.00"
+            },
+            {
+              "name": "кофе",
+              "sum": "120.00"
+            },
+            {
+              "name": "рынок",
+              "sum": "630.00"
             }
           ]
         }
