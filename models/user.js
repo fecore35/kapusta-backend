@@ -35,6 +35,11 @@ const userSchema = new Schema(
       },
       default: Role.USER,
     },
+    rebalancing: {
+      type: Boolean,
+      default: false,
+      required: [true, "Set rebalancing for transaction"],
+    },
     token: {
       type: String,
       default: null,

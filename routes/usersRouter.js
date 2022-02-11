@@ -2,7 +2,6 @@ import {
   validateUpdate,
   validateUsersQuery,
   validateId,
-  validateUpdateBalance,
 } from "../middlewares/validation/usersValidation"
 import roleAccess from "../middlewares/role-access"
 import userControllers from "../controllers/users/user-controllers"
@@ -31,10 +30,6 @@ router.delete(
   userControllers.delUser
 )
 
-router.put(
-  "/balance",
-  [guard, validateUpdateBalance],
-  userControllers.putUserBalance
-)
+router.put("/balance", guard, userControllers.putUserBalance)
 
 export default router
