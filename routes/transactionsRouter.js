@@ -2,6 +2,8 @@ import {
   validateCreate,
   validateQuery,
   validateId,
+  validateDescriptionsQuery,
+  validateStatsQuery,
 } from "../middlewares/validation/transactionsValidation"
 import transactionControllers from "../controllers/transactions/transaction-controllers"
 import guard from "../middlewares/guard"
@@ -35,14 +37,14 @@ router.get(
 )
 
 router.get(
-  "/stats",
-  [guard, validateQuery],
+  "/stats/:month/:year",
+  [guard, validateStatsQuery],
   transactionControllers.transactionsCategoryStats
 )
 
 router.get(
-  "/description",
-  [guard, validateQuery],
+  "/description/:month/:year/:category",
+  [guard, validateDescriptionsQuery],
   transactionControllers.transactionsDescriptionStats
 )
 
