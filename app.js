@@ -18,8 +18,8 @@ app.use(logger(formatsLogger))
 app.use(cors())
 app.use(express.json({ limit: LIMIT_JSON }))
 app.use((req, res, next) => {
-    app.set("lang", req.acceptsLanguages(["en", "ua"]))
-    next()
+  app.set("lang", req.acceptsLanguages(["en", "ua"]))
+  next()
 })
 
 app.use("/auth", authRouter)
@@ -27,31 +27,15 @@ app.use("/users", usersRouter)
 app.use("/transactions", transactionsRouter)
 app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument))
 
-app.use((req, res) => {
-    res.status(httpCodes.NOT_FOUND).json({
-        status: "error",
-        code: httpCodes.NOT_FOUND,
-        message: "Not found",
-    })
-})
-
-// app.use((err, req, res, next) => {
-//   res.status(httpCodes.INTERNAL_SERVER_ERROR).json({
-//     status: "fail",
-//     code: httpCodes.INTERNAL_SERVER_ERROR,
-//     message: err.message,
-//   })
-// })
-
 app.use((err, req, res, next) => {
-    const statusCode = err.status || httpCodes.INTERNAL_SERVER_ERROR
-    const status =
-        statusCode === httpCodes.INTERNAL_SERVER_ERROR ? "fail" : "error"
-    res.status().json({
-        status: status,
-        code: statusCode,
-        message: err.message,
-    })
+  const statusCode = err.status || httpCodes.INTERNAL_SERVER_ERROR
+  const status =
+    statusCode === httpCodes.INTERNAL_SERVER_ERROR ? "fail" : "error"
+  res.status().json({
+    status: status,
+    code: statusCode,
+    message: err.message,
+  })
 })
 
 export default app
