@@ -4,6 +4,7 @@ import { httpCodes, Messages } from "../../lib/constants"
 import userService from "../../services/users/user-service"
 import authService from "../../services/auth/auth-service"
 import { CustomError } from "../../lib/custom-error"
+import { EmailService, SenderNodemailer } from "../../services/email"
 
 class AuthControllers {
   async registration(req, res, next) {
@@ -16,9 +17,21 @@ class AuthControllers {
       )
     }
     const data = await userService.create(req.body)
-    res
-      .status(httpCodes.OK)
-      .json({ status: "success", code: httpCodes.OK, data })
+    const emailService = new EmailService(
+      process.env.NODE_ENV,
+      new SenderNodemailer()
+    )
+    const isSend = await emailService.sendVerifyEmail(
+      email,
+      data.name,
+      data.verifyTokenEmail
+    )
+    delete data.verifyTokenEmail
+    res.status(httpCodes.CREATED).json({
+      status: "success",
+      code: httpCodes.CREATED,
+      data: { ...data, isSendEmailVerify: isSend },
+    })
   }
 
   async login(req, res, next) {

@@ -10,7 +10,15 @@ import wrapperError from "../middlewares/error-handler"
 import { Router } from "express"
 import { Role } from "../lib/constants"
 const router = new Router()
-const { getUsers, getUser, putUser, delUser, putUserBalance } = userControllers
+const {
+  getUsers,
+  getUser,
+  putUser,
+  delUser,
+  putUserBalance,
+  verifyUser,
+  repeatEmailForVerifyUser,
+} = userControllers
 
 router.get(
   "/",
@@ -33,5 +41,7 @@ router.delete(
 )
 
 router.put("/balance", guard, wrapperError(putUserBalance))
+router.get("/verify/:token", wrapperError(verifyUser))
+router.post("/verify", wrapperError(repeatEmailForVerifyUser))
 
 export default router
