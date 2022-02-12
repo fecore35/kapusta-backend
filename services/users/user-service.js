@@ -3,12 +3,24 @@ import User from "../../models/user"
 class UserService {
   async create(body) {
     const user = new User(body)
-    const { id, name, email, role, balance } = await user.save()
-    return { id, name, email, role, balance }
+    const { id, name, email, role, balance, verifyTokenEmail } =
+      await user.save()
+    return { id, name, email, role, balance, verifyTokenEmail }
   }
 
   async findByEmail(email) {
     return await User.findOne({ email })
+  }
+
+  async findByVerifyToken(verifyTokenEmail) {
+    return await User.findOne({ verifyTokenEmail })
+  }
+
+  async updateVerify(id, status) {
+    return await User.updateOne(
+      { _id: id },
+      { isVerify: status, verifyTokenEmail: null }
+    )
   }
 
   async findById(id) {
