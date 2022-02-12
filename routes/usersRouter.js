@@ -6,30 +6,32 @@ import {
 import roleAccess from "../middlewares/role-access"
 import userControllers from "../controllers/users/user-controllers"
 import guard from "../middlewares/guard"
+import wrapperError from "../middlewares/error-handler"
 import { Router } from "express"
 import { Role } from "../lib/constants"
 const router = new Router()
+const { getUsers, getUser, putUser, delUser, putUserBalance } = userControllers
 
 router.get(
   "/",
   [guard, roleAccess(Role.ADMIN), validateUsersQuery],
-  userControllers.getUsers
+  wrapperError(getUsers)
 )
 
-router.get("/:id", [guard, validateId], userControllers.getUser)
+router.get("/:id", [guard, validateId], wrapperError(getUser))
 
 router.put(
   "/:id/update",
   [guard, roleAccess(Role.ADMIN), validateId, validateUpdate],
-  userControllers.putUser
+  wrapperError(putUser)
 )
 
 router.delete(
   "/:id",
   [guard, roleAccess(Role.ADMIN), validateId],
-  userControllers.delUser
+  wrapperError(delUser)
 )
 
-router.put("/balance", guard, userControllers.putUserBalance)
+router.put("/balance", guard, wrapperError(putUserBalance))
 
 export default router
