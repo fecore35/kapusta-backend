@@ -506,11 +506,24 @@
         }
       }
     },
-    "/transactions/stats": {
+    "/transactions/stats/:month/:year": {
       "get": {
         "tags": ["Transactions"],
         "summary": "Get transactions",
-        "parameters": [],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "month",
+            "type": "string",
+            "description": "month"
+          },
+          {
+            "in": "path",
+            "name": "year",
+            "type": "string",
+            "description": "year"
+          }
+        ],
         "security": [{ "Bearer": [] }],
         "requestBody": {
           "description": "transactions's object",
@@ -537,22 +550,35 @@
         }
       }
     },
-    "/transactions/description": {
+    "/transactions/description/:month/:year/:category": {
       "get": {
         "tags": ["Transactions"],
         "summary": "Get transaction`s description",
-        "parameters": [],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "month",
+            "type": "string",
+            "description": "month"
+          },
+          {
+            "in": "path",
+            "name": "year",
+            "type": "string",
+            "description": "year"
+          },
+          {
+            "in": "path",
+            "name": "category",
+            "type": "string",
+            "description": "category"
+          }
+        ],
         "security": [{ "Bearer": [] }],
         "requestBody": {
           "description": "transactions's object",
           "required": false,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/DescriptionRequest"
-              }
-            }
-          }
+          "content": {}
         },
         "responses": {
           "200": {
@@ -1575,22 +1601,6 @@
               "spending": 0
             }
           ]
-        }
-      },
-      "StatsRequest": {
-        "type": "object",
-        "required": ["month", "year"],
-        "properties": {
-          "month": {
-            "type": "integer",
-            "description": "month",
-            "example": "1"
-          },
-          "year": {
-            "type": "integer",
-            "description": "year",
-            "example": "2022"
-          }
         }
       },
       "StatsResponse": {
