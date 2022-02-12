@@ -37,7 +37,7 @@ class TransactionService {
       income: true,
     }).populate({
       path: "owner",
-      select: "name email  role subscription",
+      select: "name email role ",
     })
     filter && (resultIncome = resultIncome.select(filter.split("|").join(" ")))
     page < 0 && (page = 1)
@@ -52,7 +52,7 @@ class TransactionService {
       income: false,
     }).populate({
       path: "owner",
-      select: "name email  role subscription",
+      select: "name email role",
     })
     filter &&
       (resultSpending = resultSpending.select(filter.split("|").join(" ")))
@@ -145,7 +145,6 @@ class TransactionService {
     const date = new Date()
     const currentMonth = date.getMonth()
     const currentYear = date.getFullYear()
-    console.log("currentMonth=", currentMonth, "currentYear=", currentYear)
     const amounts = []
     for (let i = 0; i < 6; i += 1) {
       let previousMonth = currentMonth
@@ -163,6 +162,14 @@ class TransactionService {
       amounts.push(amount)
     }
     return { summary: amounts }
+  }
+
+  async getById(userId, transactionId) {
+    const result = await Transaction.findById({
+      _id: transactionId,
+      owner: userId,
+    })
+    return result
   }
 
   async remove(userId, transactionId) {
@@ -209,6 +216,56 @@ class TransactionService {
     return {
       amounts: amounts,
       categoriesSum: categoriesSumArr,
+    }
+  }
+
+  async monthDescriptionStats(userId, year, month, category) {
+    const transactions = await Transaction.find({
+      owner: userId,
+      year,
+      month,
+      category,
+    })
+    const uniqueDescriptions = [
+      ...new Set(transactions.map((item) => item.description)),
+    ]
+
+    const descriptionsSumArr = []
+    for (const item of uniqueDescriptions) {
+      const sum = await Transaction.aggregate([
+        {
+          $match: {
+            owner: Types.ObjectId(userId),
+            year: Number(year),
+            month: Number(month),
+            category,
+            description: item,
+          },
+        },
+        {
+          $group: {
+            _id: "descriptions-qwe",
+            totalSum: { $sum: "$sum" },
+          },
+        },
+      ])
+      let totalSum = null
+      sum.length ? (totalSum = sum[0].totalSum.toFixed(2)) : (totalSum = 0)
+
+      const result = {
+        name: item,
+        sum: totalSum,
+      }
+
+      descriptionsSumArr.push(result)
+    }
+
+    return {
+      year: Number(year),
+      month: Number(month),
+      category,
+      descriptions: uniqueDescriptions,
+      descriptionsSum: descriptionsSumArr,
     }
   }
 }

@@ -3,17 +3,17 @@ import axios from "axios"
 import { httpCodes, Messages } from "../../lib/constants"
 import userService from "../../services/users/user-service"
 import authService from "../../services/auth/auth-service"
+import { CustomError } from "../../lib/custom-error"
 
 class AuthControllers {
   async registration(req, res, next) {
     const { email } = req.body
     const isUserExist = await authService.isUserExist(email)
     if (isUserExist) {
-      return res.status(httpCodes.CONFLICT).json({
-        status: "error",
-        code: httpCodes.CONFLICT,
-        message: Messages.CONFLICT[req.app.get("lang")],
-      })
+      throw new CustomError(
+        httpCodes.CONFLICT,
+        Messages.CONFLICT[req.app.get("lang")]
+      )
     }
     const data = await userService.create(req.body)
     res
@@ -26,22 +26,19 @@ class AuthControllers {
     const user = await authService.getUser(email, password)
 
     if (!user) {
-      return res.status(httpCodes.UNAUTHORIZED).json({
-        status: "error",
-        code: httpCodes.UNAUTHORIZED,
-        message: Messages.UNAUTHORIZED[req.app.get("lang")],
-      })
+      throw new CustomError(
+        httpCodes.UNAUTHORIZED,
+        Messages.UNAUTHORIZED[req.app.get("lang")]
+      )
     }
-    const { id, balance } = user
+    const { name, id, balance, rebalancing } = user
     const token = authService.getToken(user)
     await authService.setToken(user.id, token)
-    res
-      .status(httpCodes.OK)
-      .json({
-        status: "success",
-        code: httpCodes.OK,
-        data: { id, balance, token },
-      })
+    res.status(httpCodes.OK).json({
+      status: "success",
+      code: httpCodes.OK,
+      data: { name, id, balance, rebalancing, token },
+    })
   }
 
   async logout(req, res, next) {
@@ -100,14 +97,29 @@ class AuthControllers {
       const tokenForNewUser = authService.getToken(newUser)
       await authService.setToken(newUser.id, tokenForNewUser)
       const isNewUser = await userService.findByEmail(newUser.email)
+      const sendUser = JSON.stringify({
+        name: isNewUser.name,
+        email: isNewUser.email,
+        id: isNewUser.id,
+        balance: isNewUser.balance,
+        token: tokenForNewUser,
+      })
       return res.redirect(
-        `${process.env.FRONTEND_URL}/dashboard?user=${isNewUser}&newToken=${tokenForNewUser}`
+        `${process.env.FRONTEND_URL}/dashboard?user=${sendUser}`
       )
     }
+
     const newToken = await authService.getToken(isUserExist)
     await authService.updateToken(isUserExist.id, newToken)
+    const sendUser = JSON.stringify({
+      name: isUserExist.name,
+      email: isUserExist.email,
+      id: isUserExist.id,
+      balance: isUserExist.balance,
+      token: newToken,
+    })
     return res.redirect(
-      `${process.env.FRONTEND_URL}/dashboard?user=${isUserExist}&newToken=${newToken}`
+      `${process.env.FRONTEND_URL}/dashboard?user=${sendUser}`
     )
   }
 }
