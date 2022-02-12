@@ -10,19 +10,21 @@ import { TIME_REQUEST_LIMIT, REQUEST_LIMIT } from "../lib/constants"
 import { Router } from "express"
 
 const router = new Router()
+const { registration, login, logout } = authControllers
 
 router.get("/google", wrapperError(authControllers.googleAuth))
+
 router.get("/google-redirect", wrapperError(authControllers.googleRedirect))
 
 router.post(
   "/registration",
   limiter(TIME_REQUEST_LIMIT, REQUEST_LIMIT),
   validateRegistration,
-  authControllers.registration
+  wrapperError(registration)
 )
 
-router.post("/login", validateLogin, authControllers.login)
+router.post("/login", validateLogin, wrapperError(login))
 
-router.post("/logout", guard, authControllers.logout)
+router.post("/logout", guard, wrapperError(logout))
 
 export default router

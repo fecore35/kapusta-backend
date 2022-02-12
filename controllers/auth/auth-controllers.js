@@ -3,62 +3,49 @@ import axios from "axios"
 import { httpCodes, Messages } from "../../lib/constants"
 import userService from "../../services/users/user-service"
 import authService from "../../services/auth/auth-service"
+import { CustomError } from "../../lib/custom-error"
 
 class AuthControllers {
   async registration(req, res, next) {
-    try {
-      const { email } = req.body
-      const isUserExist = await authService.isUserExist(email)
-      if (isUserExist) {
-        return res.status(httpCodes.CONFLICT).json({
-          status: "error",
-          code: httpCodes.CONFLICT,
-          message: Messages.CONFLICT[req.app.get("lang")],
-        })
-      }
-      const data = await userService.create(req.body)
-      res
-        .status(httpCodes.OK)
-        .json({ status: "success", code: httpCodes.OK, data })
-    } catch (error) {
-      next(error)
+    const { email } = req.body
+    const isUserExist = await authService.isUserExist(email)
+    if (isUserExist) {
+      throw new CustomError(
+        httpCodes.CONFLICT,
+        Messages.CONFLICT[req.app.get("lang")]
+      )
     }
+    const data = await userService.create(req.body)
+    res
+      .status(httpCodes.OK)
+      .json({ status: "success", code: httpCodes.OK, data })
   }
 
   async login(req, res, next) {
-    try {
-      const { email, password } = req.body
-      const user = await authService.getUser(email, password)
+    const { email, password } = req.body
+    const user = await authService.getUser(email, password)
 
-      if (!user) {
-        return res.status(httpCodes.UNAUTHORIZED).json({
-          status: "error",
-          code: httpCodes.UNAUTHORIZED,
-          message: Messages.UNAUTHORIZED[req.app.get("lang")],
-        })
-      }
-      const { name, id, balance, rebalancing } = user
-      const token = authService.getToken(user)
-      await authService.setToken(user.id, token)
-      res.status(httpCodes.OK).json({
-        status: "success",
-        code: httpCodes.OK,
-        data: { name, id, balance, rebalancing, token },
-      })
-    } catch (error) {
-      next(error)
+    if (!user) {
+      throw new CustomError(
+        httpCodes.UNAUTHORIZED,
+        Messages.UNAUTHORIZED[req.app.get("lang")]
+      )
     }
+    const { name, id, balance, rebalancing } = user
+    const token = authService.getToken(user)
+    await authService.setToken(user.id, token)
+    res.status(httpCodes.OK).json({
+      status: "success",
+      code: httpCodes.OK,
+      data: { name, id, balance, rebalancing, token },
+    })
   }
 
   async logout(req, res, next) {
-    try {
-      await authService.setToken(req.user.id, null)
-      res
-        .status(httpCodes.NO_CONTENT)
-        .json({ status: "success", code: httpCodes.NO_CONTENT, data: {} })
-    } catch (error) {
-      next(error)
-    }
+    await authService.setToken(req.user.id, null)
+    res
+      .status(httpCodes.NO_CONTENT)
+      .json({ status: "success", code: httpCodes.NO_CONTENT, data: {} })
   }
 
   async googleAuth(req, res) {
