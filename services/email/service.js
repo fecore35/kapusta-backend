@@ -36,8 +36,6 @@ class EmailService {
             color: "#22BC66",
             text: "Confirm your account",
             link: `${this.link}/users/verify/${verifyToken}`,
-            // `<a href="${process.env.FRONTEND_URL}/users/verify/${verifyToken}">Confirm your email</a>`,
-            // `${this.link}/users/verify/${verifyToken}`,
           },
         },
         outro:
