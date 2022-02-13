@@ -5,7 +5,7 @@ class EmailService {
     this.sender = sender
     switch (env) {
       case "development":
-        this.link = "https://ef3b-78-26-151-32.ngrok.io"
+        this.link = "https://2236-78-26-151-124.ngrok.io"
         break
       case "test":
         this.link = "http://localhost:5000"
@@ -57,6 +57,7 @@ class EmailService {
     try {
       const result = await this.sender.send(msg)
       console.log(result)
+      return true
     } catch (error) {
       console.error(error.message)
       return false
