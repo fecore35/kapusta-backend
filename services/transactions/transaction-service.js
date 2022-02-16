@@ -47,6 +47,13 @@ class TransactionService {
       .skip((Number(page) - 1) * Number(limit))
       .limit(Number(limit))
 
+    // resultIncome
+    //   .sort((a, b) => b.day - a.day)
+    //   .sort((a, b) => b.month - a.month)
+    //   .sort((a, b) => b.year - a.year)
+
+    resultIncome.sort((a, b) => b.createdAt - a.createdAt)
+
     let resultSpending = Transaction.find({
       owner: userId,
       income: false,
@@ -62,6 +69,13 @@ class TransactionService {
     resultSpending = await resultSpending
       .skip((Number(page) - 1) * Number(limit))
       .limit(Number(limit))
+
+    // resultSpending
+    //   .sort((a, b) => b.day - a.day)
+    //   .sort((a, b) => b.month - a.month)
+    //   .sort((a, b) => b.year - a.year)
+
+    resultSpending.sort((a, b) => b.createdAt - a.createdAt)
 
     return { total, page, income: resultIncome, spending: resultSpending }
   }
