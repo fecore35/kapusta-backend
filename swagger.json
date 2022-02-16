@@ -11,7 +11,7 @@
   },
   "consumes": ["application/json"],
   "produces": ["application/json"],
-  "servers": [{ "url": "http://localhost:5000" }, {}],
+  "servers": [{ "url": "https://kapusta-35.herokuapp.com" }],
   "tags": [
     {
       "name": "Auth",
@@ -36,13 +36,7 @@
         "requestBody": {
           "description": "Registration's object",
           "required": false,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RegistrationRequest"
-              }
-            }
-          }
+          "content": {}
         },
         "responses": {
           "302": {
@@ -169,7 +163,7 @@
         "security": [{ "Bearer": [] }],
         "requestBody": {
           "description": "Logout user",
-          "required": true,
+          "required": false,
           "content": {}
         },
         "responses": {
@@ -445,6 +439,10 @@
           },
           "404": {
             "description": "Not Found",
+            "content": {}
+          },
+          "409": {
+            "description": "Conflict. The transaction cannot be deleted. The transaction amount exceeds your balance.",
             "content": {}
           }
         }
@@ -820,13 +818,19 @@
                 "type": "number",
                 "description": "User's balance",
                 "example": 5000
+              },
+              "rebalancing": {
+                "type": "boolean",
+                "description": "Updated user's balance",
+                "example": false
               }
             },
             "example": {
               "name": "user#1",
               "email": "user1@ordy.com",
               "role": "user",
-              "balance": 5000
+              "balance": 5000,
+              "rebalancing": false
             }
           }
         }
@@ -1330,6 +1334,11 @@
       "DeleteTransactionResponse": {
         "type": "object",
         "properties": {
+          "updatedBalance": {
+            "type": "number",
+            "description": "updatedBalance",
+            "example": "114435.58"
+          },
           "deletedTransaction": {
             "type": "object",
             "properties": {
@@ -1391,6 +1400,7 @@
           }
         },
         "example": {
+          "updatedBalance": 114435.58,
           "deletedTransaction": {
             "day": 15,
             "month": 1,
